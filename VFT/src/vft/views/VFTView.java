@@ -1,6 +1,8 @@
 package vft.views;
 
 
+import vft.views.VFTGraph;
+
 import java.awt.BorderLayout;
 import java.awt.Frame;
 
@@ -18,6 +20,14 @@ import org.eclipse.ui.*;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.SWT;
 
+// Import Lib for Graph
+import org.jgrapht.ListenableGraph;
+import org.jgrapht.ext.JGraphXAdapter;
+import org.jgrapht.graph.DefaultEdge;
+
+import com.mxgraph.layout.mxCircleLayout;
+import com.mxgraph.layout.mxIGraphLayout;
+import com.mxgraph.swing.mxGraphComponent;
 
 /**
  * This sample class demonstrates how to plug-in a new
@@ -106,6 +116,15 @@ public class VFTView extends ViewPart {
 		JPanel panel = new JPanel(new BorderLayout());
 		JLabel label = new JLabel("VFT GRAPH");
 		panel.add(label,BorderLayout.NORTH);
+		
+		// Add Graph
+		ListenableGraph<String, DefaultEdge> g = VFTGraph.init();
+		JGraphXAdapter<String, DefaultEdge> graphAdapter = 
+				new JGraphXAdapter<String, DefaultEdge>(g);
+		mxIGraphLayout layout = new mxCircleLayout(graphAdapter);
+		layout.execute(graphAdapter.getDefaultParent());
+		panel.add(new mxGraphComponent(graphAdapter));
+
 		frame.add(panel);
 
 		// Create the help context id for the viewer's control
