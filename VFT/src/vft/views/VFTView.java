@@ -1,9 +1,16 @@
 package vft.views;
 
 
+import java.awt.BorderLayout;
+import java.awt.Frame;
+
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.part.*;
 import org.eclipse.jface.viewers.*;
+import org.eclipse.swt.awt.SWT_AWT;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.jface.action.*;
 import org.eclipse.jface.dialogs.MessageDialog;
@@ -92,6 +99,14 @@ public class VFTView extends ViewPart {
 		viewer.setLabelProvider(new ViewLabelProvider());
 		viewer.setSorter(new NameSorter());
 		viewer.setInput(getViewSite());
+		
+		// Add JFrame in plug-in view for graph
+		Composite composite = new Composite(parent, SWT.EMBEDDED | SWT.NO_BACKGROUND);
+		Frame frame = SWT_AWT.new_Frame(composite);
+		JPanel panel = new JPanel(new BorderLayout());
+		JLabel label = new JLabel("VFT GRAPH");
+		panel.add(label,BorderLayout.NORTH);
+		frame.add(panel);
 
 		// Create the help context id for the viewer's control
 		PlatformUI.getWorkbench().getHelpSystem().setHelp(viewer.getControl(), "VFT.viewer");
