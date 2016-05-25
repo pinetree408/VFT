@@ -1,4 +1,4 @@
-package filter;
+package vft.filter;
 
 public class FileFilter  extends Filter {
 	

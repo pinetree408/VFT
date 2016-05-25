@@ -1,4 +1,4 @@
-package filter;
+package vft.filter;
 
 public class TestCaseFilter  extends Filter {
 	

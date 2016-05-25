@@ -1,7 +1,6 @@
-package filter;
+package vft.filter;
  
 import java.util.ArrayList;
-import filter.InterComponentFilter;
 
 
 public class FilterWrapper extends Filter {
