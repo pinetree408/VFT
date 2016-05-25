@@ -2,12 +2,14 @@ package vft.views;
 
 
 import vft.views.VFTGraph;
+import vft.views.VFTTree;
 
 import java.awt.BorderLayout;
 import java.awt.Frame;
 
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JSplitPane;
 
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.part.*;
@@ -110,12 +112,15 @@ public class VFTView extends ViewPart {
 		viewer.setSorter(new NameSorter());
 		viewer.setInput(getViewSite());
 		
-		// Add JFrame in plug-in view for graph
+		// Add JFrame in plug-in view
 		Composite composite = new Composite(parent, SWT.EMBEDDED | SWT.NO_BACKGROUND);
 		Frame frame = SWT_AWT.new_Frame(composite);
-		JPanel panel = new JPanel(new BorderLayout());
-		JLabel label = new JLabel("VFT GRAPH");
-		panel.add(label,BorderLayout.NORTH);
+		JSplitPane splitPaneV = new JSplitPane( JSplitPane.VERTICAL_SPLIT);
+		
+		// Add Panel for graph
+		JPanel graphPanel = new JPanel(new BorderLayout());
+		JLabel graphLabel = new JLabel("VFT GRAPH");
+		graphPanel.add(graphLabel,BorderLayout.NORTH);
 		
 		// Add Graph
 		ListenableGraph<String, DefaultEdge> g = VFTGraph.init();
@@ -123,9 +128,19 @@ public class VFTView extends ViewPart {
 				new JGraphXAdapter<String, DefaultEdge>(g);
 		mxIGraphLayout layout = new mxCircleLayout(graphAdapter);
 		layout.execute(graphAdapter.getDefaultParent());
-		panel.add(new mxGraphComponent(graphAdapter));
-
-		frame.add(panel);
+		graphPanel.add(new mxGraphComponent(graphAdapter));
+		
+		// Add Panel for Tree
+		JPanel treePanel = new JPanel(new BorderLayout());
+		JLabel treeLabel = new JLabel("VFT Tree");
+		treePanel.add(treeLabel,BorderLayout.NORTH);
+		
+		// Add Tree
+		treePanel.add(VFTTree.init());
+		
+	    splitPaneV.setLeftComponent(graphPanel);
+	    splitPaneV.setRightComponent(treePanel);
+		frame.add(splitPaneV);
 
 		// Create the help context id for the viewer's control
 		PlatformUI.getWorkbench().getHelpSystem().setHelp(viewer.getControl(), "VFT.viewer");
