@@ -1,8 +1,13 @@
 package vft.views;
 
+import java.util.ArrayList;
+
 import org.jgrapht.ListenableGraph;
 import org.jgrapht.graph.DefaultEdge;
 import org.jgrapht.graph.ListenableDirectedGraph;
+
+import vft.filter.FilterWrapper;
+import vft.filter.Filter.GraphNode;
 
 public class VFTGraph {
 	
@@ -12,6 +17,7 @@ public class VFTGraph {
         ListenableGraph<String, DefaultEdge> g =
             new ListenableDirectedGraph<String, DefaultEdge>(
                 DefaultEdge.class);
+    	ArrayList<GraphNode> graphNode = new ArrayList<GraphNode>();
 
         String v1 = "v1";
         String v2 = "v2";
@@ -28,6 +34,12 @@ public class VFTGraph {
         g.addEdge(v2, v3);
         g.addEdge(v3, v1);
         g.addEdge(v4, v3);
+
+        FilterWrapper Filter = new FilterWrapper();
+        Filter.setFilterRule(1, "Atm", "Simulation"); // 1 means INTER_COMPONENT_FILTER
+        graphNode = Filter.getGraphNode();
+        for(int i = 0; i < graphNode.size(); i++) {
+        }
         
         return g;
 
