@@ -38,7 +38,11 @@ public class VFTGraph {
         FilterWrapper Filter = new FilterWrapper();
         Filter.setFilterRule(1, "Atm", "Simulation"); // 1 means INTER_COMPONENT_FILTER
         graphNode = Filter.getGraphNode();
+        
+        GraphNode gNodeToDebug =  Filter.new GraphNode(); 
         for(int i = 0; i < graphNode.size(); i++) {
+            gNodeToDebug = graphNode.get(i);
+            System.out.println("VFTGraph :  " + gNodeToDebug.caller + " -> " + gNodeToDebug.functionName + " -> " + gNodeToDebug.callee);
         }
         
         return g;
