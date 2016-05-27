@@ -8,6 +8,7 @@ import org.jgrapht.graph.ListenableDirectedGraph;
 
 import vft.filter.FilterWrapper;
 import vft.filter.Filter.GraphNode;
+import vft.filter.Filter;
 
 public class VFTGraph {
 	
@@ -18,6 +19,7 @@ public class VFTGraph {
             new ListenableDirectedGraph<String, DefaultEdge>(
                 DefaultEdge.class);
     	ArrayList<GraphNode> graphNode = new ArrayList<GraphNode>();
+    	ArrayList<String> componentList;
 
         String v1 = "v1";
         String v2 = "v2";
@@ -35,15 +37,53 @@ public class VFTGraph {
         g.addEdge(v3, v1);
         g.addEdge(v4, v3);
 
-        FilterWrapper Filter = new FilterWrapper();
-        Filter.setFilterRule(1, "Atm", "Simulation"); // 1 means INTER_COMPONENT_FILTER
-        graphNode = Filter.getGraphNode();
+        /////////////////////////////////////////       
+        long start = System.currentTimeMillis();
         
+        FilterWrapper Filter = new FilterWrapper();        
+        int i;
+        String tmpList;          
+        // 1st step : set filter rule and get list
+        componentList = Filter.setFilterRule(Filter.INTER_COMPONENT_FILTER);
+        for(i = 0; i < componentList.size(); i++) {
+        	tmpList = componentList.get(i);
+            System.out.println("VFTGraph : Package list " + tmpList);
+        }
+
+        componentList = Filter.setFilterRule(Filter.FILE_FILTER);
+        for(i = 0; i < componentList.size(); i++) {
+        	tmpList = componentList.get(i);
+            System.out.println("VFTGraph : File list " + tmpList);
+        }
+
+        componentList = Filter.setFilterRule(Filter.TEST_CASE_FILTER);
+        for(i = 0; i < componentList.size(); i++) {
+        	tmpList = componentList.get(i);
+            System.out.println("VFTGraph : Test Case list " + tmpList);
+        }
+
+        componentList = Filter.setFilterRule(Filter.TEST_METHOD_FILTER);
+        for(i = 0; i < componentList.size(); i++) {
+        	tmpList = componentList.get(i);
+            System.out.println("VFTGraph : Test Method list " + tmpList);
+        }
+        
+        
+        // 2nd step : select package or file or test case 
+        Filter.selectComponent(Filter.INTER_COMPONENT_FILTER, "Atm", "Simulation");
+        graphNode = Filter.getGraphNode();
+
+        System.out.println("VFTGraph : ##### Interface between  Atm <-> Simulation #####");
         GraphNode gNodeToDebug =  Filter.new GraphNode(); 
-        for(int i = 0; i < graphNode.size(); i++) {
+        for (i = 0; i < graphNode.size(); i++) {
             gNodeToDebug = graphNode.get(i);
             System.out.println("VFTGraph :  " + gNodeToDebug.caller + " -> " + gNodeToDebug.functionName + " -> " + gNodeToDebug.callee);
         }
+        
+        long end = System.currentTimeMillis();	     
+		System.out.println("VFTGraph : Filter  (ms) " +  (end - start));
+        
+        /////////////////////////////////////////
         
         return g;
 

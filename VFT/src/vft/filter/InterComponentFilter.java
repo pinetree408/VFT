@@ -22,8 +22,8 @@ public class InterComponentFilter extends Filter {
 		return super.setArchitectureNode(INTER_COMPONENT_FILTER, ComponentName1, ComponentName2);
 	}
 
-	private ArrayList<String> findJointPoint() {
-		throw new UnsupportedOperationException("The method is not implemented yet.");
+	protected ArrayList<String> getPackageList() {
+		return super.getPackageList();
 	}
 
 }

@@ -7,18 +7,24 @@ import org.xml.sax.SAXException;
 
 import vft.parser.parser;
 import vft.parser.parser.Arch_Channel;
+import vft.parser.parser.LogData;
 
 public class Filter {
 	
-	protected final int INTER_COMPONENT_FILTER = 1;
-	protected final int FILE_FILTER = 2;
-    protected final int TEST_CASE_FILTER = 3;
-    protected final int TEST_METHOD_FILTER = 4;
+	public final int INTER_COMPONENT_FILTER = 1;
+	public final int FILE_FILTER = 2;
+	public final int TEST_CASE_FILTER = 3;
+	public final int TEST_METHOD_FILTER = 4;
     
-	protected static String interfaceName;
-	protected static ArrayList<ErrorInfo> errorInfo = new ArrayList<ErrorInfo>();
-	protected static ArrayList<GraphNode> graphNode = new ArrayList<GraphNode>();
-	protected static ArrayList<TextualNode> textualNode = new ArrayList<TextualNode>();
+    public static ArrayList<String> packageList = new ArrayList<String>(); //for Inter-package filter
+    public static ArrayList<String> fileList = new ArrayList<String>(); //for File filter
+    public static ArrayList<String> testCaseList = new ArrayList<String>(); //for Test Case filter
+    public static ArrayList<String> testMethodList = new ArrayList<String>(); //for Test Method filter
+
+    public static String interfaceName;
+	public static ArrayList<ErrorInfo> errorInfo = new ArrayList<ErrorInfo>();
+	public static ArrayList<GraphNode> graphNode = new ArrayList<GraphNode>();
+	public static ArrayList<TextualNode> textualNode = new ArrayList<TextualNode>();
 	private ArrayList<Arch_Channel> pArchitectureData = new ArrayList<Arch_Channel>();	// parsed architecture data
 	private ArrayList<LogData> pLogData = new ArrayList<LogData>();	// parsed log data
 
@@ -28,6 +34,9 @@ public class Filter {
 		try {
 			parsedArch = new parser();
 			pArchitectureData = parsedArch.get_pared_Arch();
+			pLogData = parsedArch.get_parsed_LogData();
+			
+			collectFilterInfoForFirstPage();
 		} catch (SAXException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -36,6 +45,107 @@ public class Filter {
 			e.printStackTrace();
 		}
 	}
+
+	protected ArrayList<String> getPackageList() {
+		return packageList;
+	}	
+	
+	protected ArrayList<String> getFileList() {
+		return fileList;
+	}	
+
+	protected ArrayList<String> getTestCaseList() {		
+		return testCaseList;
+	}
+	
+	protected ArrayList<String> getTestMethodList() {		
+		return testMethodList;
+	}
+	
+	private void collectFilterInfoForFirstPage() {
+		int i, j;
+		String temp;
+		LogData tempLogData;
+		Arch_Channel tempArch;
+		
+		// Package list
+        for(i = 0; i < pArchitectureData.size(); i++) {
+        	tempArch = pArchitectureData.get(i);
+        	
+        	if (packageList.size() == 0) {        		
+        		packageList.add(new String(tempArch.start.substring(1)));
+        		packageList.add(new String(tempArch.end.substring(1)));
+        	} else {
+	            for(j = 0; j < packageList.size(); j++) {
+	            	temp = packageList.get(j);
+	            	if (tempArch.start.contains(temp)) {
+	            		break;
+	            	}
+	            }
+	            if (packageList.size() == j)
+	        		packageList.add(new String(tempArch.start.substring(1)));
+	            
+	            for(j = 0; j < packageList.size(); j++) {
+	            	temp = packageList.get(j);
+	            	if (tempArch.end.contains(temp)) {
+	            		break;
+	            	}
+	            }
+	            if (packageList.size() == j)
+	        		packageList.add(new String(tempArch.end.substring(1)));
+        	}
+        }
+        
+        for(i = 0; i < pLogData.size(); i++) {
+        	tempLogData = pLogData.get(i);
+        	
+        	// File list
+        	if (fileList.size() == 0) {        		
+        		fileList.add(new String(tempLogData.fileName));
+        	} else {
+	            for(j = 0; j < fileList.size(); j++) {
+	            	temp = fileList.get(j);
+	            	if (tempLogData.fileName.equals(temp)) {
+	            		break;
+	            	}
+	            }
+	            if (fileList.size() == j)
+	            	fileList.add(new String(tempLogData.fileName));	            
+        	}
+        	// Test case list
+        	if (testCaseList.size() == 0) {        		
+        		testCaseList.add(new String(tempLogData.testSuiteName));
+        	} else {
+	            for(j = 0; j < testCaseList.size(); j++) {
+	            	temp = testCaseList.get(j);
+	            	if (tempLogData.testSuiteName.equals(temp)) {
+	            		break;
+	            	}
+	            }
+	            if (testCaseList.size() == j)
+	            	testCaseList.add(new String(tempLogData.testSuiteName));	            
+        	}
+
+        	// Test method list
+        	if (testMethodList.size() == 0) {        		
+        		testMethodList.add(new String(tempLogData.functionName));
+        	} else {
+	            for(j = 0; j < testMethodList.size(); j++) {
+	            	temp = testMethodList.get(j);
+	            	if (tempLogData.functionName.equals(temp)) {
+	            		break;
+	            	}
+	            }
+	            if (testMethodList.size() == j && tempLogData.action.equals("call") &&
+	            		tempLogData.functionName.startsWith("com.atmsimulation"))
+	            	testMethodList.add(new String(tempLogData.functionName));	         
+            				          
+        	}
+        }
+		
+	}
+
+
 	
 	protected boolean setArchitectureNode(int filterRule, String inputParam1, String inputParam2) {
 		int i, j;
@@ -46,31 +156,32 @@ public class Filter {
 		//setArchData();
 		graphNode.clear();
 		textualNode.clear();
-		Arch_Channel temp;
+		Arch_Channel tempArch;
+		LogData tempLogData;
 		GraphNode gNodeTemp;
 		
 		//set graphNode based on parsed architecture data
 		if (filterRule == INTER_COMPONENT_FILTER) {
 	        for(i = 0; i < pArchitectureData.size(); i++) {
-	        	temp = pArchitectureData.get(i);
+	        	tempArch = pArchitectureData.get(i);
 
 	        	//Graph node
-	        	if (temp.start.contains(inputParam1) && temp.end.contains(inputParam2)) { // package1 -> package2
-	                for(j = 0; j < temp.event.size(); j++) {
+	        	if (tempArch.start.contains(inputParam1) && tempArch.end.contains(inputParam2)) { // package1 -> package2
+	                for(j = 0; j < tempArch.event.size(); j++) {
 	    	        	gNodeTemp = new GraphNode();
 		        		gNodeTemp.caller = inputParam1;
 		        		gNodeTemp.callee = inputParam2;
-	                	gNodeTemp.functionName = temp.event.get(j);
+	                	gNodeTemp.functionName = tempArch.event.get(j);
 	            		graphNode.add(gNodeTemp);
 	            		ret = true;
 	                }
 	        	}
-	        	if (temp.end.contains(inputParam1) && temp.start.contains(inputParam2)) { // package2 -> package1
-	                for(j = 0; j < temp.event.size(); j++) {
+	        	if (tempArch.end.contains(inputParam1) && tempArch.start.contains(inputParam2)) { // package2 -> package1
+	                for(j = 0; j < tempArch.event.size(); j++) {
 	    	        	gNodeTemp = new GraphNode();
 		        		gNodeTemp.caller = inputParam2;
 		        		gNodeTemp.callee = inputParam1;
-	                	gNodeTemp.functionName = temp.event.get(j);
+	                	gNodeTemp.functionName = tempArch.event.get(j);
 	            		graphNode.add(gNodeTemp);
 	            		ret = true;
 	                }
@@ -84,12 +195,39 @@ public class Filter {
 		else if (filterRule == FILE_FILTER) {  	        	
 			//TO DO : Need to list-up functions in selected source file, but this information is not given from XML file.
 			//        So, we need to check it from log file, but , it can be incomplete...
+			
+			// 1. File list
+			// 2. Function list of each file
+			/*
+	        for(i = 0; i < pLogData.size(); i++) {
+	        	tempLogData = pLogData.get(i);
+
+	        	//Graph node
+	        	if (tempLogData.start.contains(inputParam1)) { // package1 -> package2
+	                for(j = 0; j < tempLogData.event.size(); j++) {
+	    	        	gNodeTemp = new GraphNode();
+		        		gNodeTemp.caller = inputParam1;
+		        		gNodeTemp.callee = inputParam2;
+	                	gNodeTemp.functionName = tempLogData.event.get(j);
+	            		graphNode.add(gNodeTemp);
+	            		ret = true;
+	                }
+	        	}
+	        	//TO DO : Text-tree node        	
+	        	
+	        	
+	        }			
+	        	*/
 		}
 		else if (filterRule == TEST_CASE_FILTER) {  
 			//TO DO : Need to list-up functions in selected test case file, but this information is not given from XML file.
 			//        So, we need to check it from log file, but , it can be incomplete...
+			
+			// 1. Test suite list
+			// 2. Package and interface
 		}
-		else if (filterRule == TEST_METHOD_FILTER) {  
+		else if (filterRule == TEST_METHOD_FILTER) {
+			// 1.package and interface  
 		}
 		/* for debugging
         long end = System.currentTimeMillis();	      
@@ -168,13 +306,4 @@ public class Filter {
 		public String contentsInfo;
 		public TextualNode textualNode;
 	}	
-	public class LogData{
-		String start;
-		String end;
-		String fileName;
-		String lineNumber;
-		String action;
-		String functionName;
-		String inputValue;		
-	}
 }

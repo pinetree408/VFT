@@ -1,5 +1,7 @@
 package vft.filter;
 
+import java.util.ArrayList;
+
 public class TestMethodFilter  extends Filter {
 	
 	private static String testMethodName;
@@ -18,5 +20,8 @@ public class TestMethodFilter  extends Filter {
 		return super.setArchitectureNode(TEST_METHOD_FILTER, testMethodName, null);
 	}
 
+	protected ArrayList<String> getTestMethodList() {
+		return super.getTestMethodList();
+	}
 
 }

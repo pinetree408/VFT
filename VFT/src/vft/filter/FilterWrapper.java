@@ -15,8 +15,26 @@ public class FilterWrapper extends Filter {
 		super();
 		// TODO Auto-generated constructor stub
 	}
+	
+	public ArrayList<String> setFilterRule(int rule) {
+		filterRule = rule;
+		if (rule == INTER_COMPONENT_FILTER) {
+			InterComponentFilter ICF = new InterComponentFilter();
+			return ICF.getPackageList();
+		} else if (rule == FILE_FILTER) {
+			FileFilter FF = new FileFilter();
+			return FF.getFileList();
+		} else if (rule == TEST_CASE_FILTER) {
+			TestCaseFilter TC = new TestCaseFilter();
+			return TC.getTestCaseList();
+		} else if (rule == TEST_METHOD_FILTER) {
+			TestMethodFilter TM = new TestMethodFilter();
+			return TM.getTestMethodList();
+		} 		
+		return null;
+	}
 
-	public boolean setFilterRule(int rule, String package1, String package2) {
+	public boolean selectComponent(int rule, String package1, String package2) {
 		filterRule = rule;
 		if (rule == INTER_COMPONENT_FILTER) {
 			InterComponentFilter ICF = new InterComponentFilter();

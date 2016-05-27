@@ -1,5 +1,7 @@
 package vft.filter;
 
+import java.util.ArrayList;
+
 public class FileFilter  extends Filter {
 	
 	private static String fileName;
@@ -18,5 +20,8 @@ public class FileFilter  extends Filter {
 		return super.setArchitectureNode(FILE_FILTER, fileName, null);
 	}
 
+	protected ArrayList<String> getFileList() {
+		return super.getFileList();
+	}
 
 }

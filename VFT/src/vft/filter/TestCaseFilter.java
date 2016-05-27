@@ -1,5 +1,7 @@
 package vft.filter;
 
+import java.util.ArrayList;
+
 public class TestCaseFilter  extends Filter {
 	
 	private static String testCaseName;
@@ -18,5 +20,9 @@ public class TestCaseFilter  extends Filter {
 		return super.setArchitectureNode(TEST_CASE_FILTER, testCaseName, null);
 	}
 
+
+	protected ArrayList<String> getTestCaseList() {
+		return super.getTestCaseList();
+	}
 
 }
