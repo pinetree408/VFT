@@ -9,7 +9,7 @@ import java.awt.Frame;
 
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JSplitPane;
+import javax.swing.JTabbedPane;
 
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.part.*;
@@ -115,7 +115,7 @@ public class VFTView extends ViewPart {
 		// Add JFrame in plug-in view
 		Composite composite = new Composite(parent, SWT.EMBEDDED | SWT.NO_BACKGROUND);
 		Frame frame = SWT_AWT.new_Frame(composite);
-		JSplitPane splitPaneV = new JSplitPane( JSplitPane.VERTICAL_SPLIT);
+		JTabbedPane tabPane = new JTabbedPane();
 		
 		// Add Panel for graph
 		JPanel graphPanel = new JPanel(new BorderLayout());
@@ -138,9 +138,9 @@ public class VFTView extends ViewPart {
 		// Add Tree
 		treePanel.add(VFTTree.init());
 		
-	    splitPaneV.setLeftComponent(graphPanel);
-	    splitPaneV.setRightComponent(treePanel);
-		frame.add(splitPaneV);
+		tabPane.addTab("Graph", graphPanel);
+		tabPane.addTab("Tree", treePanel);
+		frame.add(tabPane);
 
 		// Create the help context id for the viewer's control
 		PlatformUI.getWorkbench().getHelpSystem().setHelp(viewer.getControl(), "VFT.viewer");
