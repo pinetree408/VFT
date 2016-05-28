@@ -62,6 +62,10 @@ public class FilterWrapper extends Filter {
 		return super.setInterface(interfaceName);			
 	}
 
+	public void prePareLogData () {
+		super.prePareLogData();			
+	}
+
 	public ArrayList<ErrorInfo> getErrorInfo() {
 		return super.getErrorInfo();
 	}

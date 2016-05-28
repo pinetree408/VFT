@@ -1,14 +1,12 @@
 package vft.views;
 
-import java.util.ArrayList;
-
 import org.jgrapht.ListenableGraph;
 import org.jgrapht.graph.DefaultEdge;
 import org.jgrapht.graph.ListenableDirectedGraph;
 
+import java.util.ArrayList;
 import vft.filter.FilterWrapper;
-import vft.filter.Filter.GraphNode;
-import vft.filter.Filter;
+import vft.filter.Filter.GraphNode; 
 
 public class VFTGraph {
 	
@@ -43,6 +41,7 @@ public class VFTGraph {
         FilterWrapper Filter = new FilterWrapper();        
         int i;
         String tmpList;          
+        Filter.prePareLogData();
         // 1st step : set filter rule and get list
         componentList = Filter.setFilterRule(Filter.INTER_COMPONENT_FILTER);
         for(i = 0; i < componentList.size(); i++) {
@@ -79,11 +78,31 @@ public class VFTGraph {
             gNodeToDebug = graphNode.get(i);
             System.out.println("VFTGraph :  " + gNodeToDebug.caller + " -> " + gNodeToDebug.functionName + " -> " + gNodeToDebug.callee);
         }
+                
+        Filter.selectComponent(Filter.FILE_FILTER, "Simulation.java", null);
+        graphNode = Filter.getGraphNode();
+
+        System.out.println("VFTGraph : ##### Interface with this file #####");
+        gNodeToDebug =  Filter.new GraphNode(); 
+        for (i = 0; i < graphNode.size(); i++) {
+            gNodeToDebug = graphNode.get(i);
+            System.out.println("VFTGraph :  " + gNodeToDebug.caller + " -> " + gNodeToDebug.functionName + " -> " + gNodeToDebug.callee);
+        } 
         
+        Filter.selectComponent(Filter.TEST_CASE_FILTER, "testBankName", null);
+        graphNode = Filter.getGraphNode();
+
+        System.out.println("VFTGraph : ##### call graph involved with this test case #####");
+        gNodeToDebug =  Filter.new GraphNode(); 
+        for (i = 0; i < graphNode.size(); i++) {
+            gNodeToDebug = graphNode.get(i);
+            System.out.println("VFTGraph :  " + gNodeToDebug.caller + " -> " + gNodeToDebug.functionName + " -> " + gNodeToDebug.callee);
+        }
+
+
         long end = System.currentTimeMillis();	     
-		System.out.println("VFTGraph : Filter  (ms) " +  (end - start));
+		System.out.println("VFTGraph : Filter  (ms) " +  (end - start)); 
         
-        /////////////////////////////////////////
         
         return g;
 

@@ -7,7 +7,7 @@ import org.xml.sax.SAXException;
 
 import vft.parser.parser;
 import vft.parser.parser.Arch_Channel;
-import vft.parser.parser.LogData;
+//import vft.parser.parser.LogData;
 
 public class Filter {
 	
@@ -27,25 +27,29 @@ public class Filter {
 	public static ArrayList<TextualNode> textualNode = new ArrayList<TextualNode>();
 	private ArrayList<Arch_Channel> pArchitectureData = new ArrayList<Arch_Channel>();	// parsed architecture data
 	private ArrayList<LogData> pLogData = new ArrayList<LogData>();	// parsed log data
-
-	protected Filter() {  
-		//collect basic information here -> architecture data(architectureData) and log data				
-		parser parsedArch = null;
+	parser parsedArch = null;
+	
+	protected Filter() {  			
 		try {
 			parsedArch = new parser();
 			pArchitectureData = parsedArch.get_pared_Arch();
-			pLogData = parsedArch.get_parsed_LogData();
-			
-			collectFilterInfoForFirstPage();
+			//pLogData = parsedArch.get_parsed_LogData();
+			setlogdata();
 		} catch (SAXException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}
+		}	
 	}
 
+
+	public void prePareLogData () {		
+		//collect basic information here -> architecture data(architectureData) and log data
+		collectFilterInfoForFirstPage();
+	}
+	
 	protected ArrayList<String> getPackageList() {
 		return packageList;
 	}	
@@ -95,7 +99,7 @@ public class Filter {
 	        		packageList.add(new String(tempArch.end.substring(1)));
         	}
         }
-        
+
         for(i = 0; i < pLogData.size(); i++) {
         	tempLogData = pLogData.get(i);
         	
@@ -112,6 +116,7 @@ public class Filter {
 	            if (fileList.size() == j)
 	            	fileList.add(new String(tempLogData.fileName));	            
         	}
+        	
         	// Test case list
         	if (testCaseList.size() == 0) {        		
         		testCaseList.add(new String(tempLogData.testSuiteName));
@@ -128,24 +133,38 @@ public class Filter {
 
         	// Test method list
         	if (testMethodList.size() == 0) {        		
-        		testMethodList.add(new String(tempLogData.functionName));
+
+	            if (tempLogData.action.equals("call") &&
+	            		tempLogData.calledClass.startsWith("com.atmsimulation")) {
+	            	String[] splitText = tempLogData.calledClass.split("[.]");
+	    			if (tempLogData.functionName.equals(splitText[splitText.length - 1])) { //constructor call
+	            		testMethodList.add(new String(tempLogData.calledClass));
+	    			} else {
+	            		testMethodList.add(new String(tempLogData.calledClass + "." + tempLogData.functionName));    				
+	    			}
+	            }
+    			
         	} else {
 	            for(j = 0; j < testMethodList.size(); j++) {
 	            	temp = testMethodList.get(j);
-	            	if (tempLogData.functionName.equals(temp)) {
+	            	if (temp.endsWith(tempLogData.functionName)) {
 	            		break;
 	            	}
 	            }
 	            if (testMethodList.size() == j && tempLogData.action.equals("call") &&
-	            		tempLogData.functionName.startsWith("com.atmsimulation"))
-	            	testMethodList.add(new String(tempLogData.functionName));	         
+	            		tempLogData.calledClass.startsWith("com.atmsimulation")) {
+	            	String[] splitText = tempLogData.calledClass.split("[.]");
+	    			if (tempLogData.functionName.equals(splitText[splitText.length - 1])) { //constructor call
+	            		testMethodList.add(new String(tempLogData.calledClass));
+	    			} else {
+	            		testMethodList.add(new String(tempLogData.calledClass + "." + tempLogData.functionName));    				
+	    			}   
+	            }
             				          
         	}
         }
 		
 	}
-
-
 	
 	protected boolean setArchitectureNode(int filterRule, String inputParam1, String inputParam2) {
 		int i, j;
@@ -163,7 +182,7 @@ public class Filter {
 		//set graphNode based on parsed architecture data
 		if (filterRule == INTER_COMPONENT_FILTER) {
 	        for(i = 0; i < pArchitectureData.size(); i++) {
-	        	tempArch = pArchitectureData.get(i);
+	        	tempArch = pArchitectureData.get(i); 
 
 	        	//Graph node
 	        	if (tempArch.start.contains(inputParam1) && tempArch.end.contains(inputParam2)) { // package1 -> package2
@@ -190,44 +209,84 @@ public class Filter {
 	        	
 	        	
 	        	
+	        	
 	        }	
 		}
-		else if (filterRule == FILE_FILTER) {  	        	
-			//TO DO : Need to list-up functions in selected source file, but this information is not given from XML file.
-			//        So, we need to check it from log file, but , it can be incomplete...
-			
-			// 1. File list
-			// 2. Function list of each file
-			/*
+		else if (filterRule == FILE_FILTER) {
+			String mCalledClassName;
+
+			// selected file is caller or callee	            
 	        for(i = 0; i < pLogData.size(); i++) {
 	        	tempLogData = pLogData.get(i);
+	        	String[] splitText = tempLogData.calledClass.split("[.]");
+				mCalledClassName = splitText[splitText.length - 1]+".java";
 
-	        	//Graph node
-	        	if (tempLogData.start.contains(inputParam1)) { // package1 -> package2
-	                for(j = 0; j < tempLogData.event.size(); j++) {
-	    	        	gNodeTemp = new GraphNode();
-		        		gNodeTemp.caller = inputParam1;
-		        		gNodeTemp.callee = inputParam2;
-	                	gNodeTemp.functionName = tempLogData.event.get(j);
-	            		graphNode.add(gNodeTemp);
-	            		ret = true;
-	                }
+	        	//Graph node 
+	        	if (tempLogData.fileName.equals(inputParam1) || mCalledClassName.equals(inputParam1)) { 
+		            if (tempLogData.action.equals("call") && tempLogData.calledClass.startsWith("com.atmsimulation")) {
+			            for(j = 0; j < graphNode.size(); j++) {
+			            	gNodeTemp = graphNode.get(j);
+			            	if (tempLogData.fileName.equals(gNodeTemp.caller) &&
+			            			tempLogData.functionName.equals(gNodeTemp.functionName) &&
+			            			mCalledClassName.equals(gNodeTemp.callee)) {
+			            		break;
+			            	}
+			            }
+			            if (graphNode.size() == j) {
+			        		gNodeTemp.caller = tempLogData.fileName;
+			        		gNodeTemp.callee = mCalledClassName;
+		                	gNodeTemp.functionName = tempLogData.functionName;
+		            		graphNode.add(gNodeTemp);
+			            }			            
+		            }		            
 	        	}
+	        	
 	        	//TO DO : Text-tree node        	
 	        	
 	        	
-	        }			
-	        	*/
+	        }	        	
 		}
 		else if (filterRule == TEST_CASE_FILTER) {  
-			//TO DO : Need to list-up functions in selected test case file, but this information is not given from XML file.
-			//        So, we need to check it from log file, but , it can be incomplete...
-			
-			// 1. Test suite list
-			// 2. Package and interface
+
+			String mCalledClassName;
+
+			// selected file is caller or callee	            
+	        for(i = 0; i < pLogData.size(); i++) {
+	        	tempLogData = pLogData.get(i);
+	        	String[] splitText = tempLogData.calledClass.split("[.]");
+				mCalledClassName = splitText[splitText.length - 1]+".java";
+
+	        	//Graph node 
+	        	if (tempLogData.testSuiteName.equals(inputParam1)) { 
+		            if (tempLogData.action.equals("call") && tempLogData.calledClass.startsWith("com.atmsimulation")) {
+			            for(j = 0; j < graphNode.size(); j++) {
+			            	gNodeTemp = graphNode.get(j);
+			            	if (tempLogData.fileName.equals(gNodeTemp.caller) &&
+			            			tempLogData.functionName.equals(gNodeTemp.functionName) &&
+			            			mCalledClassName.equals(gNodeTemp.callee)) {
+			            		break;
+			            	}
+			            }
+			            if (graphNode.size() == j) {
+			        		gNodeTemp.caller = tempLogData.fileName;
+			        		gNodeTemp.callee = mCalledClassName;
+		                	gNodeTemp.functionName = tempLogData.functionName;
+		            		graphNode.add(gNodeTemp);
+			            }			            
+		            }		            
+	        	}
+	        	
+	        	//TO DO : Text-tree node        	
+	        	
+	        	
+	        }	        	
 		}
 		else if (filterRule == TEST_METHOD_FILTER) {
 			// 1.package and interface  
+			
+			
+			
+			
 		}
 		/* for debugging
         long end = System.currentTimeMillis();	      
@@ -291,6 +350,155 @@ public class Filter {
 		return textualNode;
 	}
 
+	private void setlogdata() {
+		LogData tempLogData;
+		tempLogData = new LogData();
+		tempLogData.testSuiteName = new String("testBankName");
+		tempLogData.start = new String("CSimulation");
+		tempLogData.end = new String("CAtm");
+		tempLogData.fileName = new String("ATMApplet.java");
+		tempLogData.lineNumber = new String("31");
+		tempLogData.functionName = new String("ATM");
+		tempLogData.calledClass = new String("com.atmsimulation.atm.ATM");
+		tempLogData.action = new String("call");
+		tempLogData.inputParams = new String("42, Gordon College, First National Bank of Podunk, null");
+		tempLogData.errorMsg = new String("null");
+		pLogData.add(tempLogData);
+		
+		tempLogData = new LogData();
+		tempLogData.testSuiteName = new String("testBankName");
+		tempLogData.start = new String("CSimulation");
+		tempLogData.end = new String("CAtm");
+		tempLogData.fileName = new String("ATM.java");
+		tempLogData.lineNumber = new String("40");
+		tempLogData.functionName = new String("ATM");
+		tempLogData.calledClass = new String("com.atmsimulation.atm.ATM");
+		tempLogData.action = new String("preinitialization");
+		tempLogData.inputParams = new String("42, Gordon College, First National Bank of Podunk, null");
+		tempLogData.errorMsg = new String("null");
+		pLogData.add(tempLogData);
+
+		tempLogData = new LogData();
+		tempLogData.testSuiteName = new String("testBankName");
+		tempLogData.start = new String("CSimulation");
+		tempLogData.end = new String("CAtm");
+		tempLogData.fileName = new String("ATM.java");
+		tempLogData.lineNumber = new String("40");
+		tempLogData.functionName = new String("ATM");
+		tempLogData.calledClass = new String("com.atmsimulation.atm.ATM");
+		tempLogData.action = new String("initialization");
+		tempLogData.inputParams = new String("42, Gordon College, First National Bank of Podunk, null");
+		tempLogData.errorMsg = new String("null");
+		pLogData.add(tempLogData);
+		 
+		tempLogData = new LogData();
+		tempLogData.testSuiteName = new String("testBankName");
+		tempLogData.start = new String("CSimulation");
+		tempLogData.end = new String("CAtm");
+		tempLogData.fileName = new String("ATM.java");
+		tempLogData.lineNumber = new String("40");
+		tempLogData.functionName = new String("Runnable");
+		tempLogData.calledClass = new String("java.lang.Runnable");
+		tempLogData.action = new String("initialization");
+		tempLogData.inputParams = new String("null");
+		tempLogData.errorMsg = new String("null");
+		pLogData.add(tempLogData);
+		
+		tempLogData = new LogData();
+		tempLogData.testSuiteName = new String("testBankName");
+		tempLogData.start = new String("CSimulation");
+		tempLogData.end = new String("CAtm");
+		tempLogData.fileName = new String("ATM.java");
+		tempLogData.lineNumber = new String("45");
+		tempLogData.functionName = new String("bankAddress");
+		tempLogData.calledClass = new String("com.atmsimulation.atm.ATM");
+		tempLogData.action = new String("set");
+		tempLogData.inputParams = new String("null");
+		tempLogData.errorMsg = new String("null");
+		pLogData.add(tempLogData);
+		
+		tempLogData = new LogData();
+		tempLogData.testSuiteName = new String("testBankName");
+		tempLogData.start = new String("CSimulation");
+		tempLogData.end = new String("CAtm");
+		tempLogData.fileName = new String("ATM.java");
+		tempLogData.lineNumber = new String("49");
+		tempLogData.functionName = new String("Log");
+		tempLogData.calledClass = new String("com.atmsimulation.atm.physical.Log");
+		tempLogData.action = new String("call");
+		tempLogData.inputParams = new String("null");
+		tempLogData.errorMsg = new String("null");
+		pLogData.add(tempLogData);
+
+		tempLogData = new LogData();
+		tempLogData.testSuiteName = new String("testBankName");
+		tempLogData.start = new String("CBanking");
+		tempLogData.end = new String("CAtm");
+		tempLogData.fileName = new String("CashDispenser.java");
+		tempLogData.lineNumber = new String("28");
+		tempLogData.functionName = new String("Money");
+		tempLogData.calledClass = new String("com.atmsimulation.banking.Money");
+		tempLogData.action = new String("call");
+		tempLogData.inputParams = new String("null");
+		tempLogData.errorMsg = new String("null");
+		pLogData.add(tempLogData);	 
+
+
+		tempLogData = new LogData();
+		tempLogData.testSuiteName = new String("testBankName");
+		tempLogData.start = new String("CSimulation");
+		tempLogData.end = new String("CAtm");
+		tempLogData.fileName = new String("Money.java");
+		tempLogData.lineNumber = new String("48");
+		tempLogData.functionName = new String("append");
+		tempLogData.calledClass = new String("java.lang.StringBuilder");
+		tempLogData.action = new String("call");
+		tempLogData.inputParams = new String("null");
+		tempLogData.errorMsg = new String("null");
+		pLogData.add(tempLogData);	 
+		
+		tempLogData = new LogData();
+		tempLogData.testSuiteName = new String("testBankName");
+		tempLogData.start = new String("CAtm");
+		tempLogData.end = new String("CSimulation");
+		tempLogData.fileName = new String("CustomerConsole.java");
+		tempLogData.lineNumber = new String("35");
+		tempLogData.functionName = new String("getInstance");
+		tempLogData.calledClass = new String("com.atmsimulation.simulation.Simulation");
+		tempLogData.action = new String("call");
+		tempLogData.inputParams = new String("null");
+		tempLogData.errorMsg = new String("null");
+		pLogData.add(tempLogData);	 
+		
+		tempLogData = new LogData();
+		tempLogData.testSuiteName = new String("testBankName");
+		tempLogData.start = new String("CAtm");
+		tempLogData.end = new String("CSimulation");
+		tempLogData.fileName = new String("CustomerConsole.java");
+		tempLogData.lineNumber = new String("35");
+		tempLogData.functionName = new String("display");
+		tempLogData.calledClass = new String("com.atmsimulation.simulation.Simulation");
+		tempLogData.action = new String("call");
+		tempLogData.inputParams = new String("Not currently available");
+		tempLogData.errorMsg = new String("null");
+		pLogData.add(tempLogData);	 
+		
+		tempLogData = new LogData();
+		tempLogData.testSuiteName = new String("testBankName");
+		tempLogData.start = new String("CAtm");
+		tempLogData.end = new String("CSimulation");
+		tempLogData.fileName = new String("Simulation.java");
+		tempLogData.lineNumber = new String("129");
+		tempLogData.functionName = new String("display");
+		tempLogData.calledClass = new String("com.atmsimulation.simulation.SimDisplay");
+		tempLogData.action = new String("call");
+		tempLogData.inputParams = new String("Not currently available");
+		tempLogData.errorMsg = new String("null");
+		pLogData.add(tempLogData);	 
+		
+
+	}
+	
 	public class ErrorInfo{
 		public String functionName;
 		public String errorDescription;
@@ -305,5 +513,17 @@ public class Filter {
 		public String functionName;
 		public String contentsInfo;
 		public TextualNode textualNode;
+	}	
+	public class LogData{
+		 public String testSuiteName; 
+		 public String start; 
+		 public String end; 
+		 public String fileName;  
+		 public String lineNumber;  
+		 public String functionName;  
+		 public String calledClass;  
+		 public String action;           
+		 public String inputParams;   
+		 public String errorMsg; 
 	}	
 }
