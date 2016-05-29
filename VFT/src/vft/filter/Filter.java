@@ -7,7 +7,7 @@ import org.xml.sax.SAXException;
 
 import vft.parser.parser;
 import vft.parser.parser.Arch_Channel;
-//import vft.parser.parser.LogData;
+import vft.parser.parser.LogData;
 
 public class Filter {
 	
@@ -33,8 +33,8 @@ public class Filter {
 		try {
 			parsedArch = new parser();
 			pArchitectureData = parsedArch.get_pared_Arch();
-			//pLogData = parsedArch.get_parsed_LogData();
-			setlogdata();
+			pLogData = parsedArch.get_parsed_LogData();
+			//setlogdata();
 		} catch (SAXException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -68,9 +68,9 @@ public class Filter {
 	
 	private void collectFilterInfoForFirstPage() {
 		int i, j;
-		String temp;
 		LogData tempLogData;
 		Arch_Channel tempArch;
+		String temp;
 		
 		// Package list
         for(i = 0; i < pArchitectureData.size(); i++) {
@@ -104,66 +104,86 @@ public class Filter {
         	tempLogData = pLogData.get(i);
         	
         	// File list
-        	if (fileList.size() == 0) {        		
-        		fileList.add(new String(tempLogData.fileName));
+        	if (tempLogData.fileName.equals("null")) {
+	            System.out.println("Filter : Log Err - The fileName is null. Don't add this log to File list.");
         	} else {
-	            for(j = 0; j < fileList.size(); j++) {
-	            	temp = fileList.get(j);
-	            	if (tempLogData.fileName.equals(temp)) {
-	            		break;
-	            	}
-	            }
-	            if (fileList.size() == j)
-	            	fileList.add(new String(tempLogData.fileName));	            
+	        	if (fileList.size() == 0) {        		
+	        		fileList.add(new String(tempLogData.fileName));
+	        	} else {
+		            for(j = 0; j < fileList.size(); j++) {
+		            	temp = fileList.get(j);
+		            	if (tempLogData.fileName.equals(temp)) {
+		            		break;
+		            	}
+		            }
+		            if (fileList.size() == j)
+		            	fileList.add(new String(tempLogData.fileName));	            
+	        	}
         	}
         	
+        	
         	// Test case list
-        	if (testCaseList.size() == 0) {        		
-        		testCaseList.add(new String(tempLogData.testSuiteName));
+        	if (tempLogData.testSuiteName.equals("null")) {
+	            System.out.println("Filter : Log Err - The testSuiteName is null. Don't add this log to Test case list.");
         	} else {
-	            for(j = 0; j < testCaseList.size(); j++) {
-	            	temp = testCaseList.get(j);
-	            	if (tempLogData.testSuiteName.equals(temp)) {
-	            		break;
-	            	}
-	            }
-	            if (testCaseList.size() == j)
-	            	testCaseList.add(new String(tempLogData.testSuiteName));	            
+	        	if (testCaseList.size() == 0) {        		
+	        		testCaseList.add(new String(tempLogData.testSuiteName));
+	        	} else {
+		            for(j = 0; j < testCaseList.size(); j++) {
+		            	temp = testCaseList.get(j);
+		            	if (tempLogData.testSuiteName.equals(temp)) {
+		            		break;
+		            	}
+		            }
+		            if (testCaseList.size() == j)
+		            	testCaseList.add(new String(tempLogData.testSuiteName));	            
+	        	}
         	}
-
+        	
         	// Test method list
-        	if (testMethodList.size() == 0) {        		
-
+        	if (testMethodList.size() == 0) {
 	            if (tempLogData.action.equals("call") &&
 	            		tempLogData.calledClass.startsWith("com.atmsimulation")) {
 	            	String[] splitText = tempLogData.calledClass.split("[.]");
-	    			if (tempLogData.functionName.equals(splitText[splitText.length - 1])) { //constructor call
+	    			if (tempLogData.functionName.equals("<init>")) { //constructor call
 	            		testMethodList.add(new String(tempLogData.calledClass));
+	    			} else if (tempLogData.functionName.equals("null")) { //
+	    	            System.out.println("Filter : Log Err - The functionName is null. Don't add this log to Test Method list.");
 	    			} else {
-	            		testMethodList.add(new String(tempLogData.calledClass + "." + tempLogData.functionName));    				
+	            		testMethodList.add(new String(tempLogData.calledClass + "." + tempLogData.functionName));
 	    			}
 	            }
     			
         	} else {
+    			String mfunctionName = "null";	            	
+    			String[] splitText;
+    			splitText = tempLogData.calledClass.split("[.]");
+    			
+	        	if (!tempLogData.calledClass.equals("null") && tempLogData.functionName.equals("<init>"))
+	        		mfunctionName =  splitText[splitText.length - 1];
+	        	else 
+        			mfunctionName =  tempLogData.functionName;	        		
+	        	
 	            for(j = 0; j < testMethodList.size(); j++) {
 	            	temp = testMethodList.get(j);
-	            	if (temp.endsWith(tempLogData.functionName)) {
+	            	if (temp.endsWith(mfunctionName)) {
 	            		break;
 	            	}
-	            }
-	            if (testMethodList.size() == j && tempLogData.action.equals("call") &&
+	            } 
+	            if (testMethodList.size() == j && 
+	            		tempLogData.action.equals("call") && 
 	            		tempLogData.calledClass.startsWith("com.atmsimulation")) {
-	            	String[] splitText = tempLogData.calledClass.split("[.]");
-	    			if (tempLogData.functionName.equals(splitText[splitText.length - 1])) { //constructor call
+	    			if (tempLogData.functionName.equals("<init>")) { //constructor call
 	            		testMethodList.add(new String(tempLogData.calledClass));
+	    			} else if (tempLogData.functionName.equals("null") || mfunctionName.equals("null")) { //
+	    	            System.out.println("Filter : Log Err - The functionName is null. Don't add this log to Test Method list.");
 	    			} else {
-	            		testMethodList.add(new String(tempLogData.calledClass + "." + tempLogData.functionName));    				
+	            		testMethodList.add(new String(tempLogData.calledClass + "." + mfunctionName));    			
 	    			}   
-	            }
-            				          
+	            }            				          
         	}
-        }
-		
+        	
+        }		
 	}
 	
 	protected boolean setArchitectureNode(int filterRule, String inputParam1, String inputParam2) {
@@ -214,28 +234,36 @@ public class Filter {
 		}
 		else if (filterRule == FILE_FILTER) {
 			String mCalledClassName;
+			String mfunctionName;
 
 			// selected file is caller or callee	            
 	        for(i = 0; i < pLogData.size(); i++) {
 	        	tempLogData = pLogData.get(i);
 	        	String[] splitText = tempLogData.calledClass.split("[.]");
 				mCalledClassName = splitText[splitText.length - 1]+".java";
+	        	if (tempLogData.functionName.equals("<init>"))
+	        		mfunctionName =  splitText[splitText.length - 1];
+	        	else 
+        			mfunctionName =  tempLogData.functionName;	        		
 
+	            //System.out.println("Filter FILE_FILTER : calledClass " + tempLogData.calledClass + " function " + mfunctionName+ " action "+tempLogData.action);
+	            
 	        	//Graph node 
 	        	if (tempLogData.fileName.equals(inputParam1) || mCalledClassName.equals(inputParam1)) { 
 		            if (tempLogData.action.equals("call") && tempLogData.calledClass.startsWith("com.atmsimulation")) {
 			            for(j = 0; j < graphNode.size(); j++) {
 			            	gNodeTemp = graphNode.get(j);
 			            	if (tempLogData.fileName.equals(gNodeTemp.caller) &&
-			            			tempLogData.functionName.equals(gNodeTemp.functionName) &&
+			            			mfunctionName.equals(gNodeTemp.functionName) &&
 			            			mCalledClassName.equals(gNodeTemp.callee)) {
 			            		break;
 			            	}
 			            }
 			            if (graphNode.size() == j) {
+			        		gNodeTemp = new GraphNode();
 			        		gNodeTemp.caller = tempLogData.fileName;
 			        		gNodeTemp.callee = mCalledClassName;
-		                	gNodeTemp.functionName = tempLogData.functionName;
+		                	gNodeTemp.functionName = mfunctionName;
 		            		graphNode.add(gNodeTemp);
 			            }			            
 		            }		            
@@ -268,6 +296,7 @@ public class Filter {
 			            	}
 			            }
 			            if (graphNode.size() == j) {
+			        		gNodeTemp = new GraphNode();
 			        		gNodeTemp.caller = tempLogData.fileName;
 			        		gNodeTemp.callee = mCalledClassName;
 		                	gNodeTemp.functionName = tempLogData.functionName;
@@ -349,7 +378,7 @@ public class Filter {
 	ArrayList<TextualNode> getTextualNode() {
 		return textualNode;
 	}
-
+/*
 	private void setlogdata() {
 		LogData tempLogData;
 		tempLogData = new LogData();
@@ -498,6 +527,7 @@ public class Filter {
 		
 
 	}
+	*/
 	
 	public class ErrorInfo{
 		public String functionName;
@@ -514,6 +544,7 @@ public class Filter {
 		public String contentsInfo;
 		public TextualNode textualNode;
 	}	
+	/*
 	public class LogData{
 		 public String testSuiteName; 
 		 public String start; 
@@ -525,5 +556,5 @@ public class Filter {
 		 public String action;           
 		 public String inputParams;   
 		 public String errorMsg; 
-	}	
+	}*/	
 }
