@@ -11,10 +11,10 @@ import vft.parser.parser.LogData;
 
 public class Filter {
 	
-	public final int INTER_COMPONENT_FILTER = 1;
-	public final int FILE_FILTER = 2;
-	public final int TEST_CASE_FILTER = 3;
-	public final int TEST_METHOD_FILTER = 4;
+    public final int INTER_COMPONENT_FILTER = 1;
+    public final int FILE_FILTER = 2;
+    public final int TEST_CASE_FILTER = 3;
+    public final int TEST_METHOD_FILTER = 4;
     
     public static ArrayList<String> packageList = new ArrayList<String>(); //for Inter-package filter
     public static ArrayList<String> fileList = new ArrayList<String>(); //for File filter
@@ -22,14 +22,14 @@ public class Filter {
     public static ArrayList<String> testMethodList = new ArrayList<String>(); //for Test Method filter
 
     public static String interfaceName;
-	public static ArrayList<ErrorInfo> errorInfo = new ArrayList<ErrorInfo>();
-	public static ArrayList<GraphNode> graphNode = new ArrayList<GraphNode>();
-	public static ArrayList<TextualNode> textualNode = new ArrayList<TextualNode>();
-	private ArrayList<Arch_Channel> pArchitectureData = new ArrayList<Arch_Channel>();	// parsed architecture data
-	private ArrayList<LogData> pLogData = new ArrayList<LogData>();	// parsed log data
-	parser parsedArch = null;
+    public static ArrayList<ErrorInfo> errorInfo = new ArrayList<ErrorInfo>();
+    public static ArrayList<GraphNode> graphNode = new ArrayList<GraphNode>();
+    public static ArrayList<TextualNode> textualNode = new ArrayList<TextualNode>();
+    private ArrayList<Arch_Channel> pArchitectureData = new ArrayList<Arch_Channel>();	// parsed architecture data
+    private ArrayList<LogData> pLogData = new ArrayList<LogData>();	// parsed log data
+    parser parsedArch = null;
 	
-	protected Filter() {  			
+    protected Filter() {  			
 		try {
 			parsedArch = new parser();
 			pArchitectureData = parsedArch.get_pared_Arch();
@@ -134,8 +134,9 @@ public class Filter {
 		            		break;
 		            	}
 		            }
-		            if (testCaseList.size() == j)
-		            	testCaseList.add(new String(tempLogData.testSuiteName));	            
+		            if (testCaseList.size() == j) {
+		            	testCaseList.add(new String(tempLogData.testSuiteName));
+		            }
 	        	}
         	}
         	
@@ -188,10 +189,7 @@ public class Filter {
 	protected boolean setArchitectureNode(int filterRule, String inputParam1, String inputParam2) {
 		int i, j;
 		boolean ret = false;
-
-        //long start = System.currentTimeMillis();
-        
-		//setArchData();
+ 
 		graphNode.clear();
 		textualNode.clear();
 		Arch_Channel tempArch;
@@ -207,9 +205,9 @@ public class Filter {
 	        	if (tempArch.start.contains(inputParam1) && tempArch.end.contains(inputParam2)) { // package1 -> package2
 	                for(j = 0; j < tempArch.event.size(); j++) {
 	    	        	gNodeTemp = new GraphNode();
-		        		gNodeTemp.caller = inputParam1;
-		        		gNodeTemp.callee = inputParam2;
-	                	gNodeTemp.functionName = tempArch.event.get(j);
+	    	        	gNodeTemp.caller = inputParam1;
+	    	        	gNodeTemp.callee = inputParam2;
+	    	        	gNodeTemp.functionName = tempArch.event.get(j);
 	            		graphNode.add(gNodeTemp);
 	            		ret = true;
 	                }
@@ -217,18 +215,13 @@ public class Filter {
 	        	if (tempArch.end.contains(inputParam1) && tempArch.start.contains(inputParam2)) { // package2 -> package1
 	                for(j = 0; j < tempArch.event.size(); j++) {
 	    	        	gNodeTemp = new GraphNode();
-		        		gNodeTemp.caller = inputParam2;
-		        		gNodeTemp.callee = inputParam1;
+	    	        	gNodeTemp.caller = inputParam2;
+	    	        	gNodeTemp.callee = inputParam1;
 	                	gNodeTemp.functionName = tempArch.event.get(j);
 	            		graphNode.add(gNodeTemp);
 	            		ret = true;
 	                }
-	        	}	        	
-	        	//TO DO : Text-tree node
-	        	
-	        	
-	        	
-	        	
+	        	}	        	 
 	        }	
 		}
 		else if (filterRule == FILE_FILTER) {
@@ -243,9 +236,8 @@ public class Filter {
 	        	if (tempLogData.functionName.equals("<init>"))
 	        		mfunctionName =  splitText[splitText.length - 1];
 	        	else 
-        			mfunctionName =  tempLogData.functionName;	        		
-	            
-	        	//Graph node 
+	        		mfunctionName =  tempLogData.functionName;	        		
+	             
 	        	if (tempLogData.fileName.equals(inputParam1) || mCalledClassName.equals(inputParam1)) { 
 		            if (tempLogData.action.equals("call") && tempLogData.calledClass.startsWith("com.atmsimulation")) {
 			            for(j = 0; j < graphNode.size(); j++) {
@@ -261,25 +253,28 @@ public class Filter {
 			        		gNodeTemp.caller = tempLogData.fileName;
 			        		gNodeTemp.callee = mCalledClassName;
 		                	gNodeTemp.functionName = mfunctionName;
+		                	gNodeTemp.param = tempLogData.inputParams;
 		            		graphNode.add(gNodeTemp);
+		            		ret = true;
 			            }			            
 		            }		            
 	        	}
-	        	
-	        	//TO DO : Text-tree node        	
-	        	
-	        	
 	        }	        	
 		}
 		else if (filterRule == TEST_CASE_FILTER) {  
 
 			String mCalledClassName;
+			String mfunctionName;
 
 			// selected file is caller or callee	            
 	        for(i = 0; i < pLogData.size(); i++) {
 	        	tempLogData = pLogData.get(i);
 	        	String[] splitText = tempLogData.calledClass.split("[.]");
 				mCalledClassName = splitText[splitText.length - 1]+".java";
+	        	if (tempLogData.functionName.equals("<init>"))
+	        		mfunctionName =  splitText[splitText.length - 1];
+	        	else 
+	        		mfunctionName =  tempLogData.functionName;	        		
 
 	        	//Graph node 
 	        	if (tempLogData.testSuiteName.equals(inputParam1)) { 
@@ -287,7 +282,58 @@ public class Filter {
 			            for(j = 0; j < graphNode.size(); j++) {
 			            	gNodeTemp = graphNode.get(j);
 			            	if (tempLogData.fileName.equals(gNodeTemp.caller) &&
-			            			tempLogData.functionName.equals(gNodeTemp.functionName) &&
+			            			mfunctionName.equals(gNodeTemp.functionName) &&
+			            			mCalledClassName.equals(gNodeTemp.callee)) {
+			            		break;
+			            	}
+			            }
+			            if (graphNode.size() == j) {
+		    	        	gNodeTemp = new GraphNode();
+		    	        	gNodeTemp.caller = tempLogData.fileName;
+		    	        	gNodeTemp.callee = mCalledClassName;
+		    	        	gNodeTemp.functionName = mfunctionName;
+		    	        	gNodeTemp.param = tempLogData.inputParams;
+		    	        	graphNode.add(gNodeTemp);
+		            		ret = true;
+			            }			            
+		            }		            
+	        	}	        	
+	        }	        	
+		}
+		else if (filterRule == TEST_METHOD_FILTER) { 
+			setInterfaceNode(inputParam1);			
+		}	
+        return ret;
+	}	 
+	
+	private boolean setInterfaceNode(String interfaceName) {
+		
+		int i,j,k;
+		boolean ret = false;
+		LogData tempLogData;
+		GraphNode gNodeTemp;
+		
+		String mCalledClassName;
+		String mfunctionName;
+		
+        for(k = 0; k < fileList.size(); k++) {
+        	String fileNmae = fileList.get(k);
+        	
+	        for(i = 0; i < pLogData.size(); i++) {
+	        	tempLogData = pLogData.get(i);
+	        	String[] splitText = tempLogData.calledClass.split("[.]");
+				mCalledClassName = splitText[splitText.length - 1]+".java";
+	        	if (tempLogData.functionName.equals("<init>"))
+	        		mfunctionName =  splitText[splitText.length - 1];
+	        	else 
+        			mfunctionName =  tempLogData.functionName;	        		 
+	        	
+	        	if (tempLogData.fileName.equals(fileNmae) || mCalledClassName.equals(fileNmae)) { 
+		            if (tempLogData.action.equals("call") && tempLogData.calledClass.startsWith("com.atmsimulation")) {
+			            for(j = 0; j < graphNode.size(); j++) {
+			            	gNodeTemp = graphNode.get(j);
+			            	if (tempLogData.fileName.equals(gNodeTemp.caller) &&
+			            			mfunctionName.equals(gNodeTemp.functionName) &&
 			            			mCalledClassName.equals(gNodeTemp.callee)) {
 			            		break;
 			            	}
@@ -296,94 +342,21 @@ public class Filter {
 			        		gNodeTemp = new GraphNode();
 			        		gNodeTemp.caller = tempLogData.fileName;
 			        		gNodeTemp.callee = mCalledClassName;
-		                	gNodeTemp.functionName = tempLogData.functionName;
+		                	gNodeTemp.functionName = mfunctionName;
+		                	gNodeTemp.param = tempLogData.inputParams;
 		            		graphNode.add(gNodeTemp);
+		            		ret = true;
 			            }			            
 		            }		            
-	        	}
-	        	
-	        	//TO DO : Text-tree node        	
-	        	
+	        	}     	
 	        	
 	        }	        	
-		}
-		else if (filterRule == TEST_METHOD_FILTER) { 
-
-			String mCalledClassName;
-			String mfunctionName;
-			// inputParam1 is com.atmsimulation.simulation.SimDisplay.clearDisplay
-	        for(int k = 0; k < fileList.size(); k++) {
-	        	String fileNmae = fileList.get(k);
-	        	
-		        for(i = 0; i < pLogData.size(); i++) {
-		        	tempLogData = pLogData.get(i);
-		        	String[] splitText = tempLogData.calledClass.split("[.]");
-					mCalledClassName = splitText[splitText.length - 1]+".java";
-		        	if (tempLogData.functionName.equals("<init>"))
-		        		mfunctionName =  splitText[splitText.length - 1];
-		        	else 
-	        			mfunctionName =  tempLogData.functionName;	        		 
-		        	//Graph node 
-		        	if (tempLogData.fileName.equals(fileNmae) || mCalledClassName.equals(fileNmae)) { 
-			            if (tempLogData.action.equals("call") && tempLogData.calledClass.startsWith("com.atmsimulation")) {
-				            for(j = 0; j < graphNode.size(); j++) {
-				            	gNodeTemp = graphNode.get(j);
-				            	if (tempLogData.fileName.equals(gNodeTemp.caller) &&
-				            			mfunctionName.equals(gNodeTemp.functionName) &&
-				            			mCalledClassName.equals(gNodeTemp.callee)) {
-				            		break;
-				            	}
-				            }
-				            if (graphNode.size() == j) {
-				        		gNodeTemp = new GraphNode();
-				        		gNodeTemp.caller = tempLogData.fileName;
-				        		gNodeTemp.callee = mCalledClassName;
-			                	gNodeTemp.functionName = mfunctionName;
-			            		graphNode.add(gNodeTemp);
-				            }			            
-			            }		            
-		        	}
-		        	
-		        	//TO DO : Text-tree node        	
-		        	
-		        	
-		        }	        	
-	        }
-			
-			
-			
-		}	
-        return ret;
-	}	 
+        }	        
+        return ret;		
+	}
 	
-	protected boolean setInterface (String selectedInterface) {
-		int i;
-		boolean ret = false;
-		interfaceName = selectedInterface;
-		LogData temp;
-		GraphNode gNodeTemp;
-		
-		//set graphNode based on parsed log data
-		graphNode.clear();
-		textualNode.clear();
-        for(i = 0; i < pLogData.size(); i++) {
-        	temp = pLogData.get(i);
-        	
-        	if (temp.functionName.equals(selectedInterface)) {
-        		gNodeTemp = new GraphNode();
-        		gNodeTemp.caller = temp.start;
-        		gNodeTemp.callee = temp.end;
-        		gNodeTemp.functionName = temp.functionName;
-        		graphNode.add(gNodeTemp);
-        		ret = true;
-        	}
-        }
-		
-
-		//set TextualNode based on parsed log data
-		
-		
-		return ret;		
+	protected boolean setInterface (String selectedInterface) {		
+		return setInterfaceNode(selectedInterface);		
 	}
 
 	protected boolean setTextualNode() {
@@ -415,6 +388,7 @@ public class Filter {
 		public String functionName;
 		public String caller;
 		public String callee;
+		public String param;
 	}
 	public class TextualNode{
 		public String functionName;
