@@ -5,7 +5,9 @@ import java.io.BufferedReader;
 import java.io.File; 
 import java.io.FileNotFoundException; 
 import java.io.FileReader; 
-import java.io.IOException; 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.ArrayList; 
 import java.util.List; 
 import java.util.regex.Matcher; 
@@ -40,7 +42,7 @@ public class parser {
 	 
 			 xml_parser = dbf.newDocumentBuilder(); 
 	 
-			 xml_doc = xml_parser.parse("C:\\input\\ATMSimulationSystemXML_2016_05_10.txt"); 
+			 xml_doc = xml_parser.parse(parser.class.getResourceAsStream("/logs/ATMSimulationSystemXML_2016_05_10.txt")); 
 	 
 			 xml_root = xml_doc.getDocumentElement(); 
 			  
@@ -54,10 +56,9 @@ public class parser {
 		 xml_parsing(); 
 		  
 		  
-		 //log parsing 
-		 File logFile = new File("C:\\input\\PO_log_20160510_2024.txt"); 
-		 FileReader fileReader = new FileReader(logFile); 
-		 BufferedReader reader = new BufferedReader(fileReader); 
+		 //log parsing
+		 InputStream input = parser.class.getResourceAsStream("/logs/PO_log_20160510_2024.txt");
+		 BufferedReader reader = new BufferedReader(new InputStreamReader(input)); 
 		  
 		 String line = null; 
 		 parsed_LogData = new ArrayList<LogData>(); 

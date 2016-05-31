@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<system id="1" name="ATMSimulationSystem" IP="" portRead="" implementation="" inherits="">
+	<channels>
+		<channel name="chAS" start="CAtm" end="CSimulation" dual="no">
+			<event name="acceptEnvelope"/>
+			<event name="clearDisplay"/>
+			<event name="dispenseCash"/>
+			<event name="display"/>
+			<event name="ejectCard"/>
+			<event name="getInitialCash"/>
+			<event name="getInstance"/>
+			<event name="printLogLine"/>
+			<event name="printReceiptLine"/>
+			<event name="readCard"/>
+			<event name="readInput"/>
+			<event name="retainCard"/>
+			<event name="sendMessage"/>
+		</channel>
+		<channel name="chSA" start="CSimulation" end="CAtm" dual="no">
+			<event name="cardInserted"/>
+			<event name="switchOn"/>
+			<event name="switchOff"/>
+		</channel>
+		<channel name="chSB" start="CSimulation" end="CBanking" dual="no">
+			<event name="setBalance"/>
+			<event name="Card"/>
+			<event name="getNumber"/>
+			<event name="getAmount"/>
+			<event name="getCard"/>
+			<event name="getFromAccount"/>
+			<event name="getMessageCode"/>
+			<event name="getPin"/>
+			<event name="getToAccount"/>
+		</channel>
+		<channel name="chAB" start="CAtm" end="CBanking" dual="no">
+			<event name="ACCOUNT_ABBREVIATIONS"/>
+			<event name="ACCOUNT_NAMES"/>
+			<event name="Balances"/>
+			<event name="Message"/>
+			<event name="Message.setPIN"/>
+			<event name="Message.toString"/>
+			<event name="Money"/>
+			<event name="Money.lessEqual"/>
+			<event name="Money.subtract"/>
+			<event name="Money.toString"/>
+			<event name="Receipt.getLines"/>
+			<event name="Status.getMessage"/>
+			<event name="Status.inInvalidPIN"/>
+			<event name="Status.isSuccess"/>
+			<event name="Status.toString"/>
+		</channel>
+		<channel name="chBA" start="CBanking" end="CAtm" dual="no">
+			<event name="Transaction.getSerialNumber"/>
+			<event name="ATM.getBankName"/>
+			<event name="ATM.getID"/>
+			<event name="ATM.getPlace"/>
+		</channel>
+
+	</channels>
+	<block id="1" name="CAtm" implementation="" IP="" portRead="">
+	</block>
+	<block id="2" name="CSimulation" implementation="" IP="" portRead="">
+	</block>
+	<block id="3" name="CBanking" implementation="" IP="" portRead="">
+	</block>
+	<DCLS/>
+	<procedures/>
+	<start/>
+</system>

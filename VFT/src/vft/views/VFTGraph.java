@@ -48,7 +48,7 @@ public class VFTGraph {
         	tmpList = componentList.get(i);
             System.out.println("VFTGraph : Package list " + tmpList);
         }
-
+        
         componentList = Filter.setFilterRule(Filter.FILE_FILTER);
         for(i = 0; i < componentList.size(); i++) {
         	tmpList = componentList.get(i);
