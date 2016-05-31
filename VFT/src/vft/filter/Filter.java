@@ -34,7 +34,6 @@ public class Filter {
 			parsedArch = new parser();
 			pArchitectureData = parsedArch.get_pared_Arch();
 			pLogData = parsedArch.get_parsed_LogData();
-			//setlogdata();
 		} catch (SAXException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -45,7 +44,7 @@ public class Filter {
 	}
 
 
-	public void prePareLogData () {		
+	public void prepareLogData () {		
 		//collect basic information here -> architecture data(architectureData) and log data
 		collectFilterInfoForFirstPage();
 	}
@@ -245,8 +244,6 @@ public class Filter {
 	        		mfunctionName =  splitText[splitText.length - 1];
 	        	else 
         			mfunctionName =  tempLogData.functionName;	        		
-
-	            //System.out.println("Filter FILE_FILTER : calledClass " + tempLogData.calledClass + " function " + mfunctionName+ " action "+tempLogData.action);
 	            
 	        	//Graph node 
 	        	if (tempLogData.fileName.equals(inputParam1) || mCalledClassName.equals(inputParam1)) { 
@@ -310,22 +307,52 @@ public class Filter {
 	        	
 	        }	        	
 		}
-		else if (filterRule == TEST_METHOD_FILTER) {
-			// 1.package and interface  
+		else if (filterRule == TEST_METHOD_FILTER) { 
+
+			String mCalledClassName;
+			String mfunctionName;
+			// inputParam1 is com.atmsimulation.simulation.SimDisplay.clearDisplay
+	        for(int k = 0; k < fileList.size(); k++) {
+	        	String fileNmae = fileList.get(k);
+	        	
+		        for(i = 0; i < pLogData.size(); i++) {
+		        	tempLogData = pLogData.get(i);
+		        	String[] splitText = tempLogData.calledClass.split("[.]");
+					mCalledClassName = splitText[splitText.length - 1]+".java";
+		        	if (tempLogData.functionName.equals("<init>"))
+		        		mfunctionName =  splitText[splitText.length - 1];
+		        	else 
+	        			mfunctionName =  tempLogData.functionName;	        		 
+		        	//Graph node 
+		        	if (tempLogData.fileName.equals(fileNmae) || mCalledClassName.equals(fileNmae)) { 
+			            if (tempLogData.action.equals("call") && tempLogData.calledClass.startsWith("com.atmsimulation")) {
+				            for(j = 0; j < graphNode.size(); j++) {
+				            	gNodeTemp = graphNode.get(j);
+				            	if (tempLogData.fileName.equals(gNodeTemp.caller) &&
+				            			mfunctionName.equals(gNodeTemp.functionName) &&
+				            			mCalledClassName.equals(gNodeTemp.callee)) {
+				            		break;
+				            	}
+				            }
+				            if (graphNode.size() == j) {
+				        		gNodeTemp = new GraphNode();
+				        		gNodeTemp.caller = tempLogData.fileName;
+				        		gNodeTemp.callee = mCalledClassName;
+			                	gNodeTemp.functionName = mfunctionName;
+			            		graphNode.add(gNodeTemp);
+				            }			            
+			            }		            
+		        	}
+		        	
+		        	//TO DO : Text-tree node        	
+		        	
+		        	
+		        }	        	
+	        }
 			
 			
 			
-			
-		}
-		/* for debugging
-        long end = System.currentTimeMillis();	      
-		GraphNode gNodeToDebug =  new GraphNode(); 
-        for(i = 0; i < graphNode.size(); i++) {
-        	gNodeToDebug = graphNode.get(i);
-        	System.out.println("Filter :  " + gNodeToDebug.caller + " -> " + gNodeToDebug.functionName + " -> " + gNodeToDebug.callee);
-        }
-		System.out.println("Filter : time for setArchitectureNode (ms) " +  (end - start));
-		 */		
+		}	
         return ret;
 	}	 
 	
@@ -378,156 +405,6 @@ public class Filter {
 	ArrayList<TextualNode> getTextualNode() {
 		return textualNode;
 	}
-/*
-	private void setlogdata() {
-		LogData tempLogData;
-		tempLogData = new LogData();
-		tempLogData.testSuiteName = new String("testBankName");
-		tempLogData.start = new String("CSimulation");
-		tempLogData.end = new String("CAtm");
-		tempLogData.fileName = new String("ATMApplet.java");
-		tempLogData.lineNumber = new String("31");
-		tempLogData.functionName = new String("ATM");
-		tempLogData.calledClass = new String("com.atmsimulation.atm.ATM");
-		tempLogData.action = new String("call");
-		tempLogData.inputParams = new String("42, Gordon College, First National Bank of Podunk, null");
-		tempLogData.errorMsg = new String("null");
-		pLogData.add(tempLogData);
-		
-		tempLogData = new LogData();
-		tempLogData.testSuiteName = new String("testBankName");
-		tempLogData.start = new String("CSimulation");
-		tempLogData.end = new String("CAtm");
-		tempLogData.fileName = new String("ATM.java");
-		tempLogData.lineNumber = new String("40");
-		tempLogData.functionName = new String("ATM");
-		tempLogData.calledClass = new String("com.atmsimulation.atm.ATM");
-		tempLogData.action = new String("preinitialization");
-		tempLogData.inputParams = new String("42, Gordon College, First National Bank of Podunk, null");
-		tempLogData.errorMsg = new String("null");
-		pLogData.add(tempLogData);
-
-		tempLogData = new LogData();
-		tempLogData.testSuiteName = new String("testBankName");
-		tempLogData.start = new String("CSimulation");
-		tempLogData.end = new String("CAtm");
-		tempLogData.fileName = new String("ATM.java");
-		tempLogData.lineNumber = new String("40");
-		tempLogData.functionName = new String("ATM");
-		tempLogData.calledClass = new String("com.atmsimulation.atm.ATM");
-		tempLogData.action = new String("initialization");
-		tempLogData.inputParams = new String("42, Gordon College, First National Bank of Podunk, null");
-		tempLogData.errorMsg = new String("null");
-		pLogData.add(tempLogData);
-		 
-		tempLogData = new LogData();
-		tempLogData.testSuiteName = new String("testBankName");
-		tempLogData.start = new String("CSimulation");
-		tempLogData.end = new String("CAtm");
-		tempLogData.fileName = new String("ATM.java");
-		tempLogData.lineNumber = new String("40");
-		tempLogData.functionName = new String("Runnable");
-		tempLogData.calledClass = new String("java.lang.Runnable");
-		tempLogData.action = new String("initialization");
-		tempLogData.inputParams = new String("null");
-		tempLogData.errorMsg = new String("null");
-		pLogData.add(tempLogData);
-		
-		tempLogData = new LogData();
-		tempLogData.testSuiteName = new String("testBankName");
-		tempLogData.start = new String("CSimulation");
-		tempLogData.end = new String("CAtm");
-		tempLogData.fileName = new String("ATM.java");
-		tempLogData.lineNumber = new String("45");
-		tempLogData.functionName = new String("bankAddress");
-		tempLogData.calledClass = new String("com.atmsimulation.atm.ATM");
-		tempLogData.action = new String("set");
-		tempLogData.inputParams = new String("null");
-		tempLogData.errorMsg = new String("null");
-		pLogData.add(tempLogData);
-		
-		tempLogData = new LogData();
-		tempLogData.testSuiteName = new String("testBankName");
-		tempLogData.start = new String("CSimulation");
-		tempLogData.end = new String("CAtm");
-		tempLogData.fileName = new String("ATM.java");
-		tempLogData.lineNumber = new String("49");
-		tempLogData.functionName = new String("Log");
-		tempLogData.calledClass = new String("com.atmsimulation.atm.physical.Log");
-		tempLogData.action = new String("call");
-		tempLogData.inputParams = new String("null");
-		tempLogData.errorMsg = new String("null");
-		pLogData.add(tempLogData);
-
-		tempLogData = new LogData();
-		tempLogData.testSuiteName = new String("testBankName");
-		tempLogData.start = new String("CBanking");
-		tempLogData.end = new String("CAtm");
-		tempLogData.fileName = new String("CashDispenser.java");
-		tempLogData.lineNumber = new String("28");
-		tempLogData.functionName = new String("Money");
-		tempLogData.calledClass = new String("com.atmsimulation.banking.Money");
-		tempLogData.action = new String("call");
-		tempLogData.inputParams = new String("null");
-		tempLogData.errorMsg = new String("null");
-		pLogData.add(tempLogData);	 
-
-
-		tempLogData = new LogData();
-		tempLogData.testSuiteName = new String("testBankName");
-		tempLogData.start = new String("CSimulation");
-		tempLogData.end = new String("CAtm");
-		tempLogData.fileName = new String("Money.java");
-		tempLogData.lineNumber = new String("48");
-		tempLogData.functionName = new String("append");
-		tempLogData.calledClass = new String("java.lang.StringBuilder");
-		tempLogData.action = new String("call");
-		tempLogData.inputParams = new String("null");
-		tempLogData.errorMsg = new String("null");
-		pLogData.add(tempLogData);	 
-		
-		tempLogData = new LogData();
-		tempLogData.testSuiteName = new String("testBankName");
-		tempLogData.start = new String("CAtm");
-		tempLogData.end = new String("CSimulation");
-		tempLogData.fileName = new String("CustomerConsole.java");
-		tempLogData.lineNumber = new String("35");
-		tempLogData.functionName = new String("getInstance");
-		tempLogData.calledClass = new String("com.atmsimulation.simulation.Simulation");
-		tempLogData.action = new String("call");
-		tempLogData.inputParams = new String("null");
-		tempLogData.errorMsg = new String("null");
-		pLogData.add(tempLogData);	 
-		
-		tempLogData = new LogData();
-		tempLogData.testSuiteName = new String("testBankName");
-		tempLogData.start = new String("CAtm");
-		tempLogData.end = new String("CSimulation");
-		tempLogData.fileName = new String("CustomerConsole.java");
-		tempLogData.lineNumber = new String("35");
-		tempLogData.functionName = new String("display");
-		tempLogData.calledClass = new String("com.atmsimulation.simulation.Simulation");
-		tempLogData.action = new String("call");
-		tempLogData.inputParams = new String("Not currently available");
-		tempLogData.errorMsg = new String("null");
-		pLogData.add(tempLogData);	 
-		
-		tempLogData = new LogData();
-		tempLogData.testSuiteName = new String("testBankName");
-		tempLogData.start = new String("CAtm");
-		tempLogData.end = new String("CSimulation");
-		tempLogData.fileName = new String("Simulation.java");
-		tempLogData.lineNumber = new String("129");
-		tempLogData.functionName = new String("display");
-		tempLogData.calledClass = new String("com.atmsimulation.simulation.SimDisplay");
-		tempLogData.action = new String("call");
-		tempLogData.inputParams = new String("Not currently available");
-		tempLogData.errorMsg = new String("null");
-		pLogData.add(tempLogData);	 
-		
-
-	}
-	*/
 	
 	public class ErrorInfo{
 		public String functionName;
@@ -543,18 +420,5 @@ public class Filter {
 		public String functionName;
 		public String contentsInfo;
 		public TextualNode textualNode;
-	}	
-	/*
-	public class LogData{
-		 public String testSuiteName; 
-		 public String start; 
-		 public String end; 
-		 public String fileName;  
-		 public String lineNumber;  
-		 public String functionName;  
-		 public String calledClass;  
-		 public String action;           
-		 public String inputParams;   
-		 public String errorMsg; 
-	}*/	
+	}
 }
