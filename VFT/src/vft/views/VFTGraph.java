@@ -1,7 +1,6 @@
 package vft.views;
 
 import org.jgrapht.ListenableGraph;
-import org.jgrapht.graph.DefaultEdge;
 import org.jgrapht.graph.ListenableDirectedGraph;
 
 import java.util.ArrayList;
@@ -71,7 +70,7 @@ public class VFTGraph {
         }
         
         // 2nd step : select package or file or test case
-        if (option == 0) {
+        if (option == 1) {
         	
 	        Filter.selectComponent(Filter.INTER_COMPONENT_FILTER, "Atm", "Simulation");
 	        graphNode = Filter.getGraphNode();
@@ -86,7 +85,7 @@ public class VFTGraph {
 	            System.out.println("VFTGraph :  " + gNodeToDebug.caller + " -> " + gNodeToDebug.functionName + " -> " + gNodeToDebug.callee);
 	        }
 	        
-        } else if (option == 1) {
+        } else if (option == 2) {
         	
 	        Filter.selectComponent(Filter.FILE_FILTER, "Simulation.java", null);
 	        graphNode = Filter.getGraphNode();
@@ -101,7 +100,7 @@ public class VFTGraph {
 	            System.out.println("VFTGraph :  " + gNodeToDebug.caller + " -> " + gNodeToDebug.functionName + " -> " + gNodeToDebug.callee);
 	        } 
 	        
-        } else if (option == 2) {
+        } else if (option == 3) {
         	
 	        Filter.selectComponent(Filter.TEST_CASE_FILTER, "testBankName", null);
 	        graphNode = Filter.getGraphNode();

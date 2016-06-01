@@ -4,37 +4,32 @@ package vft.views;
 import vft.views.VFTGraph;
 import vft.views.VFTTree;
 
-import java.awt.BorderLayout;
 import java.awt.Button;
 import java.awt.Frame;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import javax.swing.JComboBox;
-import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
 
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.part.*;
-import org.eclipse.jface.viewers.*;
 import org.eclipse.swt.awt.SWT_AWT;
-import org.eclipse.swt.graphics.Image;
-import org.eclipse.jface.action.*;
-import org.eclipse.jface.dialogs.MessageDialog;
-import org.eclipse.ui.*;
-import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.SWT;
 
 // Import Lib for Graph
 import org.jgrapht.ListenableGraph;
 import org.jgrapht.ext.JGraphXAdapter;
-import org.jgrapht.graph.DefaultEdge;
 
 import com.mxgraph.layout.mxCircleLayout;
 import com.mxgraph.layout.mxIGraphLayout;
 import com.mxgraph.swing.mxGraphComponent;
+
+import java.util.ArrayList;
+
+import vft.filter.FilterWrapper;
 
 /**
  * This sample class demonstrates how to plug-in a new
@@ -61,45 +56,10 @@ public class VFTView extends ViewPart {
 	 */
 	public static final String ID = "vft.views.VFTView";
 
-	private TableViewer viewer;
-	private Action action1;
-	private Action action2;
-	private Action doubleClickAction;
-	private Integer option;
-
-	/*
-	 * The content provider class is responsible for
-	 * providing objects to the view. It can wrap
-	 * existing objects in adapters or simply return
-	 * objects as-is. These objects may be sensitive
-	 * to the current input of the view, or ignore
-	 * it and always show the same content 
-	 * (like Task List, for example).
-	 */
-	 
-	class ViewContentProvider implements IStructuredContentProvider {
-		public void inputChanged(Viewer v, Object oldInput, Object newInput) {
-		}
-		public void dispose() {
-		}
-		public Object[] getElements(Object parent) {
-			return new String[] { "One", "Two", "Three" };
-		}
-	}
-	class ViewLabelProvider extends LabelProvider implements ITableLabelProvider {
-		public String getColumnText(Object obj, int index) {
-			return getText(obj);
-		}
-		public Image getColumnImage(Object obj, int index) {
-			return getImage(obj);
-		}
-		public Image getImage(Object obj) {
-			return PlatformUI.getWorkbench().
-					getSharedImages().getImage(ISharedImages.IMG_OBJ_ELEMENT);
-		}
-	}
-	class NameSorter extends ViewerSorter {
-	}
+	private JPanel graphPanel;
+	private JPanel treePanel;
+	private JPanel selectPane;
+	private Integer filterRule;
 
 	/**
 	 * The constructor.
@@ -112,11 +72,6 @@ public class VFTView extends ViewPart {
 	 * to create the viewer and initialize it.
 	 */
 	public void createPartControl(Composite parent) {
-		//viewer = new TableViewer(parent, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL);
-		//viewer.setContentProvider(new ViewContentProvider());
-		//viewer.setLabelProvider(new ViewLabelProvider());
-		//viewer.setSorter(new NameSorter());
-		//viewer.setInput(getViewSite());
 		
 		// Add JFrame in plug-in view
 		Composite composite = new Composite(parent, SWT.EMBEDDED | SWT.NO_BACKGROUND);
@@ -126,13 +81,11 @@ public class VFTView extends ViewPart {
 		JTabbedPane tabPane = new JTabbedPane();
 		
 		// Add Panel for graph
-		JPanel graphPanel = new JPanel(new BorderLayout());
-		JLabel graphLabel = new JLabel("VFT GRAPH");
-		graphPanel.add(graphLabel,BorderLayout.NORTH);
+		graphPanel = new JPanel();
 		
 		// Add Graph
-		option = 1;
-		ListenableGraph<String, String> g = VFTGraph.init(option);
+		filterRule = 0;
+		ListenableGraph<String, String> g = VFTGraph.init(filterRule);
 		JGraphXAdapter<String, String> graphAdapter = 
 				new JGraphXAdapter<String, String>(g);
 		mxIGraphLayout layout = new mxCircleLayout(graphAdapter);
@@ -140,25 +93,46 @@ public class VFTView extends ViewPart {
 		graphPanel.add(new mxGraphComponent(graphAdapter));
 		
 		// Add Panel for Tree
-		JPanel treePanel = new JPanel(new BorderLayout());
-		JLabel treeLabel = new JLabel("VFT Tree");
-		treePanel.add(treeLabel,BorderLayout.NORTH);
+		treePanel = new JPanel();
 		
 		// Add Tree
 		treePanel.add(VFTTree.init());
 		
-		tabPane.addTab("Graph", graphPanel);
-		tabPane.addTab("Tree", treePanel);
+		tabPane.addTab("VFT Graph", graphPanel);
+		tabPane.addTab("VFT Tree", treePanel);
 		
-		JPanel selectPane = new JPanel();
+		selectPane = new JPanel();
+		drawInitialSelectPane();
 		
-		String[] options = { "INTER_COMPONENT_FILTER", "FILE_FILTER", "TEST_CASE_FILTE", "TEST_METHOD_FILTER"};
-        JComboBox comboBox = new JComboBox(options);
+		splitPaneV.setLeftComponent(tabPane);
+		splitPaneV.setRightComponent(selectPane);
+		frame.add(splitPaneV);
+		
+	}
+	
+	private void drawInitialSelectPane() {
+		
+		String[] filterRules = { "NONE", "INTER_COMPONENT_FILTER", "FILE_FILTER", "TEST_CASE_FILTE", "TEST_METHOD_FILTER"};
+        JComboBox<String> comboBox = new JComboBox<String>(filterRules);
         comboBox.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-            	option = comboBox.getSelectedIndex();
+            	filterRule = comboBox.getSelectedIndex();
             	
+            	if (filterRule == 1) {
+	            	FilterWrapper Filter = new FilterWrapper();
+	            	Filter.prePareLogData();
+	            	ArrayList<String> componentList = Filter.setFilterRule(Filter.INTER_COMPONENT_FILTER);
+	            	JComboBox<String> packageBoxFrom = new JComboBox<String>(componentList.toArray(new String[componentList.size()]));
+	            	JComboBox<String> packageBoxTo = new JComboBox<String>(componentList.toArray(new String[componentList.size()]));
+	            	selectPane.add(packageBoxFrom);
+	            	selectPane.add(packageBoxTo);
+	            	selectPane.revalidate();
+            	} else if (filterRule == 0) {
+            		selectPane.removeAll();
+            		drawInitialSelectPane();
+            		selectPane.revalidate();
+            	}
             }
         });
         
@@ -167,8 +141,8 @@ public class VFTView extends ViewPart {
 
             @Override
             public void actionPerformed(ActionEvent e) {
-            	System.out.println(option);
-        		ListenableGraph<String, String> g = VFTGraph.init(option);
+            	graphPanel.removeAll();
+        		ListenableGraph<String, String> g = VFTGraph.init(filterRule);
         		JGraphXAdapter<String, String> graphAdapter = 
         				new JGraphXAdapter<String, String>(g);
         		mxIGraphLayout layout = new mxCircleLayout(graphAdapter);
@@ -180,100 +154,8 @@ public class VFTView extends ViewPart {
 		
 		selectPane.add(a);
 		selectPane.add(comboBox);
-		
-		splitPaneV.setLeftComponent(tabPane);
-		splitPaneV.setRightComponent(selectPane);
-		frame.add(splitPaneV);
-
-		// Create the help context id for the viewer's control
-		//PlatformUI.getWorkbench().getHelpSystem().setHelp(viewer.getControl(), "VFT.viewer");
-		//makeActions();
-		//hookContextMenu();
-		//hookDoubleClickAction();
-		//contributeToActionBars();
-	}
-
-/*
-	private void hookContextMenu() {
-		MenuManager menuMgr = new MenuManager("#PopupMenu");
-		menuMgr.setRemoveAllWhenShown(true);
-		menuMgr.addMenuListener(new IMenuListener() {
-			public void menuAboutToShow(IMenuManager manager) {
-				VFTView.this.fillContextMenu(manager);
-			}
-		});
-		Menu menu = menuMgr.createContextMenu(viewer.getControl());
-		viewer.getControl().setMenu(menu);
-		getSite().registerContextMenu(menuMgr, viewer);
-	}
-
-	private void contributeToActionBars() {
-		IActionBars bars = getViewSite().getActionBars();
-		fillLocalPullDown(bars.getMenuManager());
-		fillLocalToolBar(bars.getToolBarManager());
-	}
-
-	private void fillLocalPullDown(IMenuManager manager) {
-		manager.add(action1);
-		manager.add(new Separator());
-		manager.add(action2);
-	}
-
-	private void fillContextMenu(IMenuManager manager) {
-		manager.add(action1);
-		manager.add(action2);
-		// Other plug-ins can contribute there actions here
-		manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
 	}
 	
-	private void fillLocalToolBar(IToolBarManager manager) {
-		manager.add(action1);
-		manager.add(action2);
-	}
-
-	private void makeActions() {
-		action1 = new Action() {
-			public void run() {
-				showMessage("Action 1 executed");
-			}
-		};
-		action1.setText("Action 1");
-		action1.setToolTipText("Action 1 tooltip");
-		action1.setImageDescriptor(PlatformUI.getWorkbench().getSharedImages().
-			getImageDescriptor(ISharedImages.IMG_OBJS_INFO_TSK));
-		
-		action2 = new Action() {
-			public void run() {
-				showMessage("Action 2 executed");
-			}
-		};
-		action2.setText("Action 2");
-		action2.setToolTipText("Action 2 tooltip");
-		action2.setImageDescriptor(PlatformUI.getWorkbench().getSharedImages().
-				getImageDescriptor(ISharedImages.IMG_OBJS_INFO_TSK));
-		doubleClickAction = new Action() {
-			public void run() {
-				ISelection selection = viewer.getSelection();
-				Object obj = ((IStructuredSelection)selection).getFirstElement();
-				showMessage("Double-click detected on "+obj.toString());
-			}
-		};
-	}
-
-	private void hookDoubleClickAction() {
-		viewer.addDoubleClickListener(new IDoubleClickListener() {
-			public void doubleClick(DoubleClickEvent event) {
-				doubleClickAction.run();
-			}
-		});
-	}
-	private void showMessage(String message) {
-		MessageDialog.openInformation(
-			viewer.getControl().getShell(),
-			"VFT View",
-			message);
-	}
-*/
 	/**
 	 * Passing the focus request to the viewer's control.
 	 */
