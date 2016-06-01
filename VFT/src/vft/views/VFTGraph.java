@@ -9,7 +9,7 @@ import vft.filter.Filter.GraphNode;
 
 public class VFTGraph {
 	
-    public static ListenableGraph<String, String> init(int option)
+    public static ListenableGraph<String, String> init(int filteringRule, ArrayList<String> options)
     {
         // create a JGraphT graph
         ListenableGraph<String, String> g =
@@ -44,6 +44,7 @@ public class VFTGraph {
         int i;
         String tmpList;          
         Filter.prePareLogData();
+ 
         // 1st step : set filter rule and get list
         componentList = Filter.setFilterRule(Filter.INTER_COMPONENT_FILTER);
         for(i = 0; i < componentList.size(); i++) {
@@ -70,7 +71,7 @@ public class VFTGraph {
         }
         
         // 2nd step : select package or file or test case
-        if (option == 1) {
+        if (filteringRule == 1) {
         	
 	        Filter.selectComponent(Filter.INTER_COMPONENT_FILTER, "Atm", "Simulation");
 	        graphNode = Filter.getGraphNode();
@@ -85,7 +86,7 @@ public class VFTGraph {
 	            System.out.println("VFTGraph :  " + gNodeToDebug.caller + " -> " + gNodeToDebug.functionName + " -> " + gNodeToDebug.callee);
 	        }
 	        
-        } else if (option == 2) {
+        } else if (filteringRule == 2) {
         	
 	        Filter.selectComponent(Filter.FILE_FILTER, "Simulation.java", null);
 	        graphNode = Filter.getGraphNode();
@@ -100,7 +101,7 @@ public class VFTGraph {
 	            System.out.println("VFTGraph :  " + gNodeToDebug.caller + " -> " + gNodeToDebug.functionName + " -> " + gNodeToDebug.callee);
 	        } 
 	        
-        } else if (option == 3) {
+        } else if (filteringRule == 3) {
         	
 	        Filter.selectComponent(Filter.TEST_CASE_FILTER, "testBankName", null);
 	        graphNode = Filter.getGraphNode();
@@ -117,7 +118,7 @@ public class VFTGraph {
 	        
         } else {
         	
-        	String vertex = String.valueOf(option);
+        	String vertex = String.valueOf(filteringRule);
             String v1 = vertex;
             String v2 = vertex + "1";
             String v3 = vertex + "2";

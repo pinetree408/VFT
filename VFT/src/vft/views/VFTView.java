@@ -85,7 +85,8 @@ public class VFTView extends ViewPart {
 		
 		// Add Graph
 		filterRule = 0;
-		ListenableGraph<String, String> g = VFTGraph.init(filterRule);
+		ArrayList<String> options = null;
+		ListenableGraph<String, String> g = VFTGraph.init(filterRule, options);
 		JGraphXAdapter<String, String> graphAdapter = 
 				new JGraphXAdapter<String, String>(g);
 		mxIGraphLayout layout = new mxCircleLayout(graphAdapter);
@@ -118,21 +119,39 @@ public class VFTView extends ViewPart {
             @Override
             public void actionPerformed(ActionEvent e) {
             	filterRule = comboBox.getSelectedIndex();
-            	
+
+            	FilterWrapper Filter = new FilterWrapper();
+            	Filter.prePareLogData();
+
+        		if (selectPane.getComponentCount() == 4) {
+        			selectPane.remove(selectPane.getComponentCount() - 1);
+        			selectPane.remove(selectPane.getComponentCount() - 1);
+        		} else if (selectPane.getComponentCount() == 3) {
+        			selectPane.remove(selectPane.getComponentCount() - 1);
+        		}
+        		
             	if (filterRule == 1) {
-	            	FilterWrapper Filter = new FilterWrapper();
-	            	Filter.prePareLogData();
 	            	ArrayList<String> componentList = Filter.setFilterRule(Filter.INTER_COMPONENT_FILTER);
 	            	JComboBox<String> packageBoxFrom = new JComboBox<String>(componentList.toArray(new String[componentList.size()]));
 	            	JComboBox<String> packageBoxTo = new JComboBox<String>(componentList.toArray(new String[componentList.size()]));
 	            	selectPane.add(packageBoxFrom);
 	            	selectPane.add(packageBoxTo);
-	            	selectPane.revalidate();
-            	} else if (filterRule == 0) {
-            		selectPane.removeAll();
-            		drawInitialSelectPane();
-            		selectPane.revalidate();
+            	} else if (filterRule == 2) {
+	            	ArrayList<String> componentList = Filter.setFilterRule(Filter.FILE_FILTER);
+	            	JComboBox<String> packageBoxFrom = new JComboBox<String>(componentList.toArray(new String[componentList.size()]));
+	            	selectPane.add(packageBoxFrom);
+            	} else if (filterRule == 3) {
+	            	ArrayList<String> componentList = Filter.setFilterRule(Filter.TEST_CASE_FILTER);
+	            	JComboBox<String> packageBoxFrom = new JComboBox<String>(componentList.toArray(new String[componentList.size()]));
+	            	selectPane.add(packageBoxFrom);
+            	} else if (filterRule == 4) {
+	            	ArrayList<String> componentList = Filter.setFilterRule(Filter.TEST_METHOD_FILTER);
+	            	JComboBox<String> packageBoxFrom = new JComboBox<String>(componentList.toArray(new String[componentList.size()]));
+	            	selectPane.add(packageBoxFrom);
             	}
+            	
+        		selectPane.revalidate();
+        		selectPane.repaint();
             }
         });
         
@@ -142,13 +161,15 @@ public class VFTView extends ViewPart {
             @Override
             public void actionPerformed(ActionEvent e) {
             	graphPanel.removeAll();
-        		ListenableGraph<String, String> g = VFTGraph.init(filterRule);
+            	ArrayList<String> options = null;
+        		ListenableGraph<String, String> g = VFTGraph.init(filterRule, options);
         		JGraphXAdapter<String, String> graphAdapter = 
         				new JGraphXAdapter<String, String>(g);
         		mxIGraphLayout layout = new mxCircleLayout(graphAdapter);
         		layout.execute(graphAdapter.getDefaultParent());
         		graphPanel.add(new mxGraphComponent(graphAdapter));
         		graphPanel.revalidate();
+        		graphPanel.repaint();
             }
         });
 		
