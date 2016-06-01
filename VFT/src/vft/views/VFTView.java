@@ -5,10 +5,15 @@ import vft.views.VFTGraph;
 import vft.views.VFTTree;
 
 import java.awt.BorderLayout;
+import java.awt.Button;
 import java.awt.Frame;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
+import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
 
 import org.eclipse.swt.widgets.Composite;
@@ -60,6 +65,7 @@ public class VFTView extends ViewPart {
 	private Action action1;
 	private Action action2;
 	private Action doubleClickAction;
+	private Integer option;
 
 	/*
 	 * The content provider class is responsible for
@@ -106,15 +112,17 @@ public class VFTView extends ViewPart {
 	 * to create the viewer and initialize it.
 	 */
 	public void createPartControl(Composite parent) {
-		viewer = new TableViewer(parent, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL);
-		viewer.setContentProvider(new ViewContentProvider());
-		viewer.setLabelProvider(new ViewLabelProvider());
-		viewer.setSorter(new NameSorter());
-		viewer.setInput(getViewSite());
+		//viewer = new TableViewer(parent, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL);
+		//viewer.setContentProvider(new ViewContentProvider());
+		//viewer.setLabelProvider(new ViewLabelProvider());
+		//viewer.setSorter(new NameSorter());
+		//viewer.setInput(getViewSite());
 		
 		// Add JFrame in plug-in view
 		Composite composite = new Composite(parent, SWT.EMBEDDED | SWT.NO_BACKGROUND);
 		Frame frame = SWT_AWT.new_Frame(composite);
+		JSplitPane splitPaneV = new JSplitPane( JSplitPane.VERTICAL_SPLIT);
+		
 		JTabbedPane tabPane = new JTabbedPane();
 		
 		// Add Panel for graph
@@ -123,7 +131,8 @@ public class VFTView extends ViewPart {
 		graphPanel.add(graphLabel,BorderLayout.NORTH);
 		
 		// Add Graph
-		ListenableGraph<String, DefaultEdge> g = VFTGraph.init();
+		option = 1;
+		ListenableGraph<String, DefaultEdge> g = VFTGraph.init(option);
 		JGraphXAdapter<String, DefaultEdge> graphAdapter = 
 				new JGraphXAdapter<String, DefaultEdge>(g);
 		mxIGraphLayout layout = new mxCircleLayout(graphAdapter);
@@ -140,16 +149,50 @@ public class VFTView extends ViewPart {
 		
 		tabPane.addTab("Graph", graphPanel);
 		tabPane.addTab("Tree", treePanel);
-		frame.add(tabPane);
+		
+		JPanel selectPane = new JPanel();
+		
+		String[] options = { "Option1", "Option2", "Option3", "Option4", "Option5" };
+        JComboBox comboBox = new JComboBox(options);
+        comboBox.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+            	option = comboBox.getSelectedIndex();
+            }
+        });
+        
+		Button a = new Button("draw");
+		a.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+        		ListenableGraph<String, DefaultEdge> g = VFTGraph.init(option);
+        		JGraphXAdapter<String, DefaultEdge> graphAdapter = 
+        				new JGraphXAdapter<String, DefaultEdge>(g);
+        		mxIGraphLayout layout = new mxCircleLayout(graphAdapter);
+        		layout.execute(graphAdapter.getDefaultParent());
+        		graphPanel.add(new mxGraphComponent(graphAdapter));
+        		graphPanel.revalidate();
+
+            }
+        });
+		
+		selectPane.add(a);
+		selectPane.add(comboBox);
+		
+		splitPaneV.setLeftComponent(tabPane);
+		splitPaneV.setRightComponent(selectPane);
+		frame.add(splitPaneV);
 
 		// Create the help context id for the viewer's control
-		PlatformUI.getWorkbench().getHelpSystem().setHelp(viewer.getControl(), "VFT.viewer");
-		makeActions();
-		hookContextMenu();
-		hookDoubleClickAction();
-		contributeToActionBars();
+		//PlatformUI.getWorkbench().getHelpSystem().setHelp(viewer.getControl(), "VFT.viewer");
+		//makeActions();
+		//hookContextMenu();
+		//hookDoubleClickAction();
+		//contributeToActionBars();
 	}
 
+/*
 	private void hookContextMenu() {
 		MenuManager menuMgr = new MenuManager("#PopupMenu");
 		menuMgr.setRemoveAllWhenShown(true);
@@ -229,11 +272,11 @@ public class VFTView extends ViewPart {
 			"VFT View",
 			message);
 	}
-
+*/
 	/**
 	 * Passing the focus request to the viewer's control.
 	 */
 	public void setFocus() {
-		viewer.getControl().setFocus();
+		//viewer.getControl().setFocus();
 	}
 }

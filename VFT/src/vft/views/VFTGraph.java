@@ -10,7 +10,7 @@ import vft.filter.Filter.GraphNode;
 
 public class VFTGraph {
 	
-    public static ListenableGraph<String, DefaultEdge> init()
+    public static ListenableGraph<String, DefaultEdge> init(int option)
     {
         // create a JGraphT graph
         ListenableGraph<String, DefaultEdge> g =
@@ -19,10 +19,11 @@ public class VFTGraph {
     	ArrayList<GraphNode> graphNode = new ArrayList<GraphNode>();
     	ArrayList<String> componentList;
 
-        String v1 = "v1";
-        String v2 = "v2";
-        String v3 = "v3";
-        String v4 = "v4";
+    	String vertex = String.valueOf(option);
+        String v1 = vertex;
+        String v2 = vertex + "1";
+        String v3 = vertex + "2";
+        String v4 = vertex + "3";
 
         // add some sample data (graph manipulated via JGraphX)
         g.addVertex(v1);
@@ -35,6 +36,7 @@ public class VFTGraph {
         g.addEdge(v3, v1);
         g.addEdge(v4, v3);
 
+		
         /////////////////////////////////////////       
         long start = System.currentTimeMillis();
         
