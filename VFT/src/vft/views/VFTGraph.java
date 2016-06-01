@@ -10,15 +10,16 @@ import vft.filter.Filter.GraphNode;
 
 public class VFTGraph {
 	
-    public static ListenableGraph<String, DefaultEdge> init(int option)
+    public static ListenableGraph<String, String> init(int option)
     {
         // create a JGraphT graph
-        ListenableGraph<String, DefaultEdge> g =
-            new ListenableDirectedGraph<String, DefaultEdge>(
-                DefaultEdge.class);
+        ListenableGraph<String, String> g =
+            new ListenableDirectedGraph<String, String>(
+                String.class);
     	ArrayList<GraphNode> graphNode = new ArrayList<GraphNode>();
     	ArrayList<String> componentList;
 
+    	/*
     	String vertex = String.valueOf(option);
         String v1 = vertex;
         String v2 = vertex + "1";
@@ -35,7 +36,7 @@ public class VFTGraph {
         g.addEdge(v2, v3);
         g.addEdge(v3, v1);
         g.addEdge(v4, v3);
-
+	*/
 		
         /////////////////////////////////////////       
         long start = System.currentTimeMillis();
@@ -69,38 +70,71 @@ public class VFTGraph {
             System.out.println("VFTGraph : Test Method list " + tmpList);
         }
         
-        
-        // 2nd step : select package or file or test case 
-        Filter.selectComponent(Filter.INTER_COMPONENT_FILTER, "Atm", "Simulation");
-        graphNode = Filter.getGraphNode();
+        // 2nd step : select package or file or test case
+        if (option == 0) {
+        	
+	        Filter.selectComponent(Filter.INTER_COMPONENT_FILTER, "Atm", "Simulation");
+	        graphNode = Filter.getGraphNode();
+	
+	        System.out.println("VFTGraph : ##### Interface between  Atm <-> Simulation #####");
+	        GraphNode gNodeToDebug =  Filter.new GraphNode(); 
+	        for (i = 0; i < graphNode.size(); i++) {
+	            gNodeToDebug = graphNode.get(i);
+	            g.addVertex(gNodeToDebug.caller);
+	            g.addVertex(gNodeToDebug.callee);
+	            g.addEdge(gNodeToDebug.caller, gNodeToDebug.callee, gNodeToDebug.functionName);
+	            System.out.println("VFTGraph :  " + gNodeToDebug.caller + " -> " + gNodeToDebug.functionName + " -> " + gNodeToDebug.callee);
+	        }
+	        
+        } else if (option == 1) {
+        	
+	        Filter.selectComponent(Filter.FILE_FILTER, "Simulation.java", null);
+	        graphNode = Filter.getGraphNode();
+	
+	        System.out.println("VFTGraph : ##### Interface with this file #####");
+	        GraphNode gNodeToDebug =  Filter.new GraphNode(); 
+	        for (i = 0; i < graphNode.size(); i++) {
+	            gNodeToDebug = graphNode.get(i);
+	            g.addVertex(gNodeToDebug.caller);
+	            g.addVertex(gNodeToDebug.callee);
+	            g.addEdge(gNodeToDebug.caller, gNodeToDebug.callee, gNodeToDebug.functionName);
+	            System.out.println("VFTGraph :  " + gNodeToDebug.caller + " -> " + gNodeToDebug.functionName + " -> " + gNodeToDebug.callee);
+	        } 
+	        
+        } else if (option == 2) {
+        	
+	        Filter.selectComponent(Filter.TEST_CASE_FILTER, "testBankName", null);
+	        graphNode = Filter.getGraphNode();
+	
+	        System.out.println("VFTGraph : ##### call graph involved with this test case #####");
+	        GraphNode gNodeToDebug =  Filter.new GraphNode(); 
+	        for (i = 0; i < graphNode.size(); i++) {
+	            gNodeToDebug = graphNode.get(i);
+	            g.addVertex(gNodeToDebug.caller);
+	            g.addVertex(gNodeToDebug.callee);
+	            g.addEdge(gNodeToDebug.caller, gNodeToDebug.callee, gNodeToDebug.functionName);
+	            System.out.println("VFTGraph :  " + gNodeToDebug.caller + " -> " + gNodeToDebug.functionName + " -> " + gNodeToDebug.callee);
+	        }
+	        
+        } else {
+        	
+        	String vertex = String.valueOf(option);
+            String v1 = vertex;
+            String v2 = vertex + "1";
+            String v3 = vertex + "2";
+            String v4 = vertex + "3";
 
-        System.out.println("VFTGraph : ##### Interface between  Atm <-> Simulation #####");
-        GraphNode gNodeToDebug =  Filter.new GraphNode(); 
-        for (i = 0; i < graphNode.size(); i++) {
-            gNodeToDebug = graphNode.get(i);
-            System.out.println("VFTGraph :  " + gNodeToDebug.caller + " -> " + gNodeToDebug.functionName + " -> " + gNodeToDebug.callee);
+            // add some sample data (graph manipulated via JGraphX)
+            g.addVertex(v1);
+            g.addVertex(v2);
+            g.addVertex(v3);
+            g.addVertex(v4);
+
+            g.addEdge(v1, v2);
+            g.addEdge(v2, v3);
+            g.addEdge(v3, v1);
+            g.addEdge(v4, v3);
         }
-                
-        Filter.selectComponent(Filter.FILE_FILTER, "Simulation.java", null);
-        graphNode = Filter.getGraphNode();
-
-        System.out.println("VFTGraph : ##### Interface with this file #####");
-        gNodeToDebug =  Filter.new GraphNode(); 
-        for (i = 0; i < graphNode.size(); i++) {
-            gNodeToDebug = graphNode.get(i);
-            System.out.println("VFTGraph :  " + gNodeToDebug.caller + " -> " + gNodeToDebug.functionName + " -> " + gNodeToDebug.callee);
-        } 
-        
-        Filter.selectComponent(Filter.TEST_CASE_FILTER, "testBankName", null);
-        graphNode = Filter.getGraphNode();
-
-        System.out.println("VFTGraph : ##### call graph involved with this test case #####");
-        gNodeToDebug =  Filter.new GraphNode(); 
-        for (i = 0; i < graphNode.size(); i++) {
-            gNodeToDebug = graphNode.get(i);
-            System.out.println("VFTGraph :  " + gNodeToDebug.caller + " -> " + gNodeToDebug.functionName + " -> " + gNodeToDebug.callee);
-        }
-
 
         long end = System.currentTimeMillis();	     
 		System.out.println("VFTGraph : Filter  (ms) " +  (end - start)); 

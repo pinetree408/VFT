@@ -132,9 +132,9 @@ public class VFTView extends ViewPart {
 		
 		// Add Graph
 		option = 1;
-		ListenableGraph<String, DefaultEdge> g = VFTGraph.init(option);
-		JGraphXAdapter<String, DefaultEdge> graphAdapter = 
-				new JGraphXAdapter<String, DefaultEdge>(g);
+		ListenableGraph<String, String> g = VFTGraph.init(option);
+		JGraphXAdapter<String, String> graphAdapter = 
+				new JGraphXAdapter<String, String>(g);
 		mxIGraphLayout layout = new mxCircleLayout(graphAdapter);
 		layout.execute(graphAdapter.getDefaultParent());
 		graphPanel.add(new mxGraphComponent(graphAdapter));
@@ -152,12 +152,13 @@ public class VFTView extends ViewPart {
 		
 		JPanel selectPane = new JPanel();
 		
-		String[] options = { "Option1", "Option2", "Option3", "Option4", "Option5" };
+		String[] options = { "INTER_COMPONENT_FILTER", "FILE_FILTER", "TEST_CASE_FILTE", "TEST_METHOD_FILTER"};
         JComboBox comboBox = new JComboBox(options);
         comboBox.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
             	option = comboBox.getSelectedIndex();
+            	
             }
         });
         
@@ -166,14 +167,14 @@ public class VFTView extends ViewPart {
 
             @Override
             public void actionPerformed(ActionEvent e) {
-        		ListenableGraph<String, DefaultEdge> g = VFTGraph.init(option);
-        		JGraphXAdapter<String, DefaultEdge> graphAdapter = 
-        				new JGraphXAdapter<String, DefaultEdge>(g);
+            	System.out.println(option);
+        		ListenableGraph<String, String> g = VFTGraph.init(option);
+        		JGraphXAdapter<String, String> graphAdapter = 
+        				new JGraphXAdapter<String, String>(g);
         		mxIGraphLayout layout = new mxCircleLayout(graphAdapter);
         		layout.execute(graphAdapter.getDefaultParent());
         		graphPanel.add(new mxGraphComponent(graphAdapter));
         		graphPanel.revalidate();
-
             }
         });
 		
