@@ -60,6 +60,13 @@ public class VFTView extends ViewPart {
 	private JPanel treePanel;
 	private JPanel selectPane;
 	private Integer filterRule;
+	
+	private ArrayList<String> options;
+	private String packageFrom;
+	private String packageTo;
+	private String file;
+	private String testCase;
+	private String testMethod;
 
 	/**
 	 * The constructor.
@@ -85,7 +92,7 @@ public class VFTView extends ViewPart {
 		
 		// Add Graph
 		filterRule = 0;
-		ArrayList<String> options = null;
+		options = new ArrayList<String>();
 		ListenableGraph<String, String> g = VFTGraph.init(filterRule, options);
 		JGraphXAdapter<String, String> graphAdapter = 
 				new JGraphXAdapter<String, String>(g);
@@ -97,7 +104,7 @@ public class VFTView extends ViewPart {
 		treePanel = new JPanel();
 		
 		// Add Tree
-		treePanel.add(VFTTree.init());
+		treePanel.add(VFTTree.init(filterRule, options));
 		
 		tabPane.addTab("VFT Graph", graphPanel);
 		tabPane.addTab("VFT Tree", treePanel);
@@ -130,24 +137,54 @@ public class VFTView extends ViewPart {
         			selectPane.remove(selectPane.getComponentCount() - 1);
         		}
         		
-            	if (filterRule == 1) {
+            	if (filterRule == Filter.INTER_COMPONENT_FILTER) {
 	            	ArrayList<String> componentList = Filter.setFilterRule(Filter.INTER_COMPONENT_FILTER);
 	            	JComboBox<String> packageBoxFrom = new JComboBox<String>(componentList.toArray(new String[componentList.size()]));
 	            	JComboBox<String> packageBoxTo = new JComboBox<String>(componentList.toArray(new String[componentList.size()]));
+	            	packageBoxFrom.addActionListener(new ActionListener() {
+	                    @Override
+	                    public void actionPerformed(ActionEvent e) {
+	                    	packageFrom = packageBoxFrom.getSelectedItem().toString();
+	                    }
+	                });
+	            	packageBoxTo.addActionListener(new ActionListener() {
+	                    @Override
+	                    public void actionPerformed(ActionEvent e) {
+	                    	packageTo = packageBoxTo.getSelectedItem().toString();
+	                    }
+	                });
 	            	selectPane.add(packageBoxFrom);
 	            	selectPane.add(packageBoxTo);
-            	} else if (filterRule == 2) {
+            	} else if (filterRule == Filter.FILE_FILTER) {
 	            	ArrayList<String> componentList = Filter.setFilterRule(Filter.FILE_FILTER);
-	            	JComboBox<String> packageBoxFrom = new JComboBox<String>(componentList.toArray(new String[componentList.size()]));
-	            	selectPane.add(packageBoxFrom);
-            	} else if (filterRule == 3) {
+	            	JComboBox<String> fileBox = new JComboBox<String>(componentList.toArray(new String[componentList.size()]));
+	            	fileBox.addActionListener(new ActionListener() {
+	                    @Override
+	                    public void actionPerformed(ActionEvent e) {
+	                    	file = fileBox.getSelectedItem().toString();
+	                    }
+	                });
+	            	selectPane.add(fileBox);
+            	} else if (filterRule == Filter.TEST_CASE_FILTER) {
 	            	ArrayList<String> componentList = Filter.setFilterRule(Filter.TEST_CASE_FILTER);
-	            	JComboBox<String> packageBoxFrom = new JComboBox<String>(componentList.toArray(new String[componentList.size()]));
-	            	selectPane.add(packageBoxFrom);
-            	} else if (filterRule == 4) {
+	            	JComboBox<String> testCaseBox = new JComboBox<String>(componentList.toArray(new String[componentList.size()]));
+	            	testCaseBox.addActionListener(new ActionListener() {
+	                    @Override
+	                    public void actionPerformed(ActionEvent e) {
+	                    	testCase = testCaseBox.getSelectedItem().toString();
+	                    }
+	                });
+	            	selectPane.add(testCaseBox);
+            	} else if (filterRule == Filter.TEST_METHOD_FILTER) {
 	            	ArrayList<String> componentList = Filter.setFilterRule(Filter.TEST_METHOD_FILTER);
-	            	JComboBox<String> packageBoxFrom = new JComboBox<String>(componentList.toArray(new String[componentList.size()]));
-	            	selectPane.add(packageBoxFrom);
+	            	JComboBox<String> testMethodBox = new JComboBox<String>(componentList.toArray(new String[componentList.size()]));
+	            	testMethodBox.addActionListener(new ActionListener() {
+	                    @Override
+	                    public void actionPerformed(ActionEvent e) {
+	                    	testMethod = testMethodBox.getSelectedItem().toString();
+	                    }
+	                });
+	            	selectPane.add(testMethodBox);
             	}
             	
         		selectPane.revalidate();
@@ -160,8 +197,41 @@ public class VFTView extends ViewPart {
 
             @Override
             public void actionPerformed(ActionEvent e) {
+            	options.clear();
+            	FilterWrapper Filter = new FilterWrapper();
+            	Filter.prePareLogData();
+            	if (filterRule == Filter.INTER_COMPONENT_FILTER) {
+            		if (packageFrom == null){
+    	            	ArrayList<String> componentList = Filter.setFilterRule(Filter.INTER_COMPONENT_FILTER);
+    	            	packageFrom = componentList.get(0);
+            		}
+            		if (packageTo == null){
+    	            	ArrayList<String> componentList = Filter.setFilterRule(Filter.INTER_COMPONENT_FILTER);
+    	            	packageTo = componentList.get(0);
+            		}
+                	options.add(packageFrom);
+                	options.add(packageTo);
+            	} else if (filterRule == Filter.FILE_FILTER) {
+            		if (file == null){
+    	            	ArrayList<String> componentList = Filter.setFilterRule(Filter.FILE_FILTER);
+    	            	file = componentList.get(0);
+            		}
+            		options.add(file);
+            	} else if (filterRule == Filter.TEST_CASE_FILTER) {
+            		if (testCase == null){
+    	            	ArrayList<String> componentList = Filter.setFilterRule(Filter.TEST_CASE_FILTER);
+    	            	testCase = componentList.get(0);
+            		}
+            		options.add(testCase);
+            	} else if (filterRule == Filter.TEST_METHOD_FILTER) {
+            		if (testCase == null){
+    	            	ArrayList<String> componentList = Filter.setFilterRule(Filter.TEST_METHOD_FILTER);
+    	            	testMethod = componentList.get(0);
+            		}
+            		options.add(testMethod);
+            	}
+            	
             	graphPanel.removeAll();
-            	ArrayList<String> options = null;
         		ListenableGraph<String, String> g = VFTGraph.init(filterRule, options);
         		JGraphXAdapter<String, String> graphAdapter = 
         				new JGraphXAdapter<String, String>(g);
@@ -170,6 +240,12 @@ public class VFTView extends ViewPart {
         		graphPanel.add(new mxGraphComponent(graphAdapter));
         		graphPanel.revalidate();
         		graphPanel.repaint();
+        		
+        		treePanel.removeAll();
+        		treePanel.add(VFTTree.init(filterRule, options));
+        		treePanel.revalidate();
+        		treePanel.repaint();
+        		
             }
         });
 		

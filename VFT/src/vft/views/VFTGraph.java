@@ -35,7 +35,7 @@ public class VFTGraph {
         g.addEdge(v2, v3);
         g.addEdge(v3, v1);
         g.addEdge(v4, v3);
-	*/
+    	 */
 		
         /////////////////////////////////////////       
         long start = System.currentTimeMillis();
@@ -71,9 +71,9 @@ public class VFTGraph {
         }
         
         // 2nd step : select package or file or test case
-        if (filteringRule == 1) {
+        if (filteringRule == Filter.INTER_COMPONENT_FILTER) {
         	
-	        Filter.selectComponent(Filter.INTER_COMPONENT_FILTER, "Atm", "Simulation");
+	        Filter.selectComponent(Filter.INTER_COMPONENT_FILTER, options.get(0), options.get(1));
 	        graphNode = Filter.getGraphNode();
 	
 	        System.out.println("VFTGraph : ##### Interface between  Atm <-> Simulation #####");
@@ -86,9 +86,9 @@ public class VFTGraph {
 	            System.out.println("VFTGraph :  " + gNodeToDebug.caller + " -> " + gNodeToDebug.functionName + " -> " + gNodeToDebug.callee);
 	        }
 	        
-        } else if (filteringRule == 2) {
+        } else if (filteringRule == Filter.FILE_FILTER) {
         	
-	        Filter.selectComponent(Filter.FILE_FILTER, "Simulation.java", null);
+	        Filter.selectComponent(Filter.FILE_FILTER, options.get(0), null);
 	        graphNode = Filter.getGraphNode();
 	
 	        System.out.println("VFTGraph : ##### Interface with this file #####");
@@ -101,9 +101,9 @@ public class VFTGraph {
 	            System.out.println("VFTGraph :  " + gNodeToDebug.caller + " -> " + gNodeToDebug.functionName + " -> " + gNodeToDebug.callee);
 	        } 
 	        
-        } else if (filteringRule == 3) {
+        } else if (filteringRule == Filter.TEST_CASE_FILTER) {
         	
-	        Filter.selectComponent(Filter.TEST_CASE_FILTER, "testBankName", null);
+	        Filter.selectComponent(Filter.TEST_CASE_FILTER, options.get(0), null);
 	        graphNode = Filter.getGraphNode();
 	
 	        System.out.println("VFTGraph : ##### call graph involved with this test case #####");
@@ -115,7 +115,21 @@ public class VFTGraph {
 	            g.addEdge(gNodeToDebug.caller, gNodeToDebug.callee, gNodeToDebug.functionName);
 	            System.out.println("VFTGraph :  " + gNodeToDebug.caller + " -> " + gNodeToDebug.functionName + " -> " + gNodeToDebug.callee);
 	        }
-	        
+        } else if (filteringRule == Filter.TEST_METHOD_FILTER) {
+        	
+	        Filter.selectComponent(Filter.TEST_METHOD_FILTER, options.get(0), null);
+	        graphNode = Filter.getGraphNode();
+	
+	        System.out.println("VFTGraph : ##### call graph involved with this test method #####");
+	        GraphNode gNodeToDebug =  Filter.new GraphNode(); 
+	        for (i = 0; i < graphNode.size(); i++) {
+	            gNodeToDebug = graphNode.get(i);
+	            g.addVertex(gNodeToDebug.caller);
+	            g.addVertex(gNodeToDebug.callee);
+	            g.addEdge(gNodeToDebug.caller, gNodeToDebug.callee, gNodeToDebug.functionName);
+	            System.out.println("VFTGraph :  " + gNodeToDebug.caller + " -> " + gNodeToDebug.functionName + " -> " + gNodeToDebug.callee);
+	        }
+        	
         } else {
         	
         	String vertex = String.valueOf(filteringRule);
