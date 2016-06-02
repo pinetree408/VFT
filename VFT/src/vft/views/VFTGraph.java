@@ -2,8 +2,10 @@ package vft.views;
 
 import org.jgrapht.ListenableGraph;
 import org.jgrapht.graph.ListenableDirectedGraph;
+import org.jgrapht.graph.DirectedMultigraph;
 
 import java.util.ArrayList;
+
 import vft.filter.FilterWrapper;
 import vft.filter.Filter.GraphNode; 
 
@@ -14,7 +16,10 @@ public class VFTGraph {
         // create a JGraphT graph
         ListenableGraph<String, String> g =
             new ListenableDirectedGraph<String, String>(
-                String.class);
+               String.class);
+    	//DirectedMultigraph<String, String> g =
+        //     new DirectedMultigraph<String, String>(
+		//   String.class);
     	ArrayList<GraphNode> graphNode = new ArrayList<GraphNode>();
     	ArrayList<String> componentList;
 
@@ -73,33 +78,73 @@ public class VFTGraph {
         // 2nd step : select package or file or test case
         if (filteringRule == Filter.INTER_COMPONENT_FILTER) {
         	
-	        Filter.selectComponent(Filter.INTER_COMPONENT_FILTER, options.get(0), options.get(1));
-	        graphNode = Filter.getGraphNode();
-	
-	        System.out.println("VFTGraph : ##### Interface between  Atm <-> Simulation #####");
-	        GraphNode gNodeToDebug =  Filter.new GraphNode(); 
-	        for (i = 0; i < graphNode.size(); i++) {
-	            gNodeToDebug = graphNode.get(i);
-	            g.addVertex(gNodeToDebug.caller);
-	            g.addVertex(gNodeToDebug.callee);
-	            g.addEdge(gNodeToDebug.caller, gNodeToDebug.callee, gNodeToDebug.functionName);
-	            System.out.println("VFTGraph :  " + gNodeToDebug.caller + " -> " + gNodeToDebug.functionName + " -> " + gNodeToDebug.callee);
-	        }
+        	if (options.size() != 0) {
+		        Filter.selectComponent(Filter.INTER_COMPONENT_FILTER, options.get(0), options.get(1));
+		        graphNode = Filter.getGraphNode();
+		
+		        System.out.println("VFTGraph : ##### Interface between  Atm <-> Simulation #####");
+		        GraphNode gNodeToDebug =  Filter.new GraphNode(); 
+		        for (i = 0; i < graphNode.size(); i++) {
+		            gNodeToDebug = graphNode.get(i);
+		            g.addVertex(gNodeToDebug.caller);
+		            g.addVertex(gNodeToDebug.callee);
+		            g.addEdge(gNodeToDebug.caller, gNodeToDebug.callee, gNodeToDebug.functionName);
+		            System.out.println("VFTGraph :  " + gNodeToDebug.caller + " -> " + gNodeToDebug.functionName + " -> " + gNodeToDebug.callee);
+		        }
+        	} else {
+        		componentList = Filter.setFilterRule(Filter.INTER_COMPONENT_FILTER);
+        		for(int j = 0; j < componentList.size(); j++) {
+        			if (j != componentList.size() - 1) {
+        				Filter.selectComponent(Filter.INTER_COMPONENT_FILTER, componentList.get(j),componentList.get(j+1));
+        			} else {
+        				Filter.selectComponent(Filter.INTER_COMPONENT_FILTER, componentList.get(j),componentList.get(0));
+        			}
+			        graphNode = Filter.getGraphNode();
+			
+			        System.out.println("VFTGraph : ##### Interface between  Atm <-> Simulation #####");
+			        GraphNode gNodeToDebug =  Filter.new GraphNode(); 
+			        for (i = 0; i < graphNode.size(); i++) {
+			            gNodeToDebug = graphNode.get(i);
+			            g.addVertex(gNodeToDebug.caller);
+			            g.addVertex(gNodeToDebug.callee);
+			            g.addEdge(gNodeToDebug.caller, gNodeToDebug.callee, gNodeToDebug.functionName);
+			            System.out.println("VFTGraph :  " + gNodeToDebug.caller + " -> " + gNodeToDebug.functionName + " -> " + gNodeToDebug.callee);
+			        }
+        		}
+        	}
 	        
         } else if (filteringRule == Filter.FILE_FILTER) {
         	
-	        Filter.selectComponent(Filter.FILE_FILTER, options.get(0), null);
-	        graphNode = Filter.getGraphNode();
-	
-	        System.out.println("VFTGraph : ##### Interface with this file #####");
-	        GraphNode gNodeToDebug =  Filter.new GraphNode(); 
-	        for (i = 0; i < graphNode.size(); i++) {
-	            gNodeToDebug = graphNode.get(i);
-	            g.addVertex(gNodeToDebug.caller);
-	            g.addVertex(gNodeToDebug.callee);
-	            g.addEdge(gNodeToDebug.caller, gNodeToDebug.callee, gNodeToDebug.functionName);
-	            System.out.println("VFTGraph :  " + gNodeToDebug.caller + " -> " + gNodeToDebug.functionName + " -> " + gNodeToDebug.callee);
-	        } 
+        	if (options.size() != 0) {
+		        Filter.selectComponent(Filter.FILE_FILTER, options.get(0), null);
+		        graphNode = Filter.getGraphNode();
+		
+		        System.out.println("VFTGraph : ##### Interface with this file #####");
+		        GraphNode gNodeToDebug =  Filter.new GraphNode(); 
+		        for (i = 0; i < graphNode.size(); i++) {
+		            gNodeToDebug = graphNode.get(i);
+		            g.addVertex(gNodeToDebug.caller);
+		            g.addVertex(gNodeToDebug.callee);
+		            g.addEdge(gNodeToDebug.caller, gNodeToDebug.callee, gNodeToDebug.functionName);
+		            System.out.println("VFTGraph :  " + gNodeToDebug.caller + " -> " + gNodeToDebug.functionName + " -> " + gNodeToDebug.callee);
+		        }
+        	} else {
+        		componentList = Filter.setFilterRule(Filter.FILE_FILTER);
+        		for(int j = 0; j < componentList.size(); j++) {
+			        Filter.selectComponent(Filter.FILE_FILTER, componentList.get(j), null);
+			        graphNode = Filter.getGraphNode();
+			
+			        System.out.println("VFTGraph : ##### Interface with this file #####");
+			        GraphNode gNodeToDebug =  Filter.new GraphNode(); 
+			        for (i = 0; i < graphNode.size(); i++) {
+			            gNodeToDebug = graphNode.get(i);
+			            g.addVertex(gNodeToDebug.caller);
+			            g.addVertex(gNodeToDebug.callee);
+			            g.addEdge(gNodeToDebug.caller, gNodeToDebug.callee, gNodeToDebug.functionName);
+			            System.out.println("VFTGraph :  " + gNodeToDebug.caller + " -> " + gNodeToDebug.functionName + " -> " + gNodeToDebug.callee);
+			        }
+        		}
+        	}
 	        
         } else if (filteringRule == Filter.TEST_CASE_FILTER) {
         	
@@ -144,15 +189,16 @@ public class VFTGraph {
             g.addVertex(v3);
             g.addVertex(v4);
 
-            g.addEdge(v1, v2);
-            g.addEdge(v2, v3);
-            g.addEdge(v3, v1);
-            g.addEdge(v4, v3);
+            g.addEdge(v1, v2, v1 + v2);
+            g.addEdge(v1, v2, v1 + v1);
+            g.addEdge(v2, v3, v2 + v3);
+            g.addEdge(v3, v1, v3 + v4);
+            g.addEdge(v4, v3, v4 + v3);
         }
 
         long end = System.currentTimeMillis();	     
 		System.out.println("VFTGraph : Filter  (ms) " +  (end - start)); 
-        
+        System.out.println(g.toString());
         
         return g;
 
