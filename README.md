@@ -14,8 +14,12 @@ Each packages have following java sourcre code.
 Parsing module
 --------------------------
 The main file of Parsing module is *parser.java* file. And the main class is *class parser* defined in *parser.java*.  
-When *class parser* is created, xml parsing and log parsing are performed. The input log files are located in VFT/logs.
-If you want to change the log file, you should set ArchitectureFileName and LogFileName variable. 
+When *class parser* is created, xml parsing and log parsing are performed. The input log files are located in *VFT/logs*.
+If you want to change the log file, you should set *ArchitectureFileName* and *LogFileName* variable. 
+* **class Arch_Channel**
+In
+
+* **class LogData**
 
 Filtering module
 --------------------------
