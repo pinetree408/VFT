@@ -3,7 +3,7 @@ Development guideline for VFT
 
 Structure of VFT project  
 --------------------------
-VFT project consists of vft, vft.parser, vft.filter and vft.views packages.
+VFT project consists of vft, vft.parser, vft.filter and vft.views packages.  
 Each packages have following java sourcre code.
 * vft : Activator.java
 * vft.parser : parser.java
@@ -13,7 +13,8 @@ Each packages have following java sourcre code.
 
 Parsing module
 --------------------------
-VFT project includes vft, vft.parser, vft.filter and vft.views package.
+The main file of Parsing module is **parser.java** file. And the main class is **parser class**
+
 
 
 Filtering module
