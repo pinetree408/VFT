@@ -3,14 +3,24 @@ package vft.views;
 
 import vft.views.VFTGraph;
 import vft.views.VFTTree;
+import vft.filter.FilterWrapper;
 
+import java.awt.BorderLayout;
 import java.awt.Button;
+import java.awt.Dimension;
 import java.awt.Frame;
+import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.awt.event.MouseWheelEvent;
+import java.awt.event.MouseWheelListener;
 
 import javax.swing.JComboBox;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
 
@@ -22,14 +32,12 @@ import org.eclipse.swt.SWT;
 // Import Lib for Graph
 import org.jgrapht.ListenableGraph;
 import org.jgrapht.ext.JGraphXAdapter;
+import org.jgrapht.graph.DirectedMultigraph;
 
-import com.mxgraph.layout.mxCircleLayout;
-import com.mxgraph.layout.mxIGraphLayout;
+import com.mxgraph.layout.hierarchical.mxHierarchicalLayout;
 import com.mxgraph.swing.mxGraphComponent;
 
 import java.util.ArrayList;
-
-import vft.filter.FilterWrapper;
 
 /**
  * This sample class demonstrates how to plug-in a new
@@ -59,6 +67,7 @@ public class VFTView extends ViewPart {
 	private JPanel graphPanel;
 	private JPanel treePanel;
 	private JPanel selectPane;
+	private JTabbedPane tabPane;
 	private Integer filterRule;
 	
 	private ArrayList<String> options;
@@ -67,6 +76,8 @@ public class VFTView extends ViewPart {
 	private String file;
 	private String testCase;
 	private String testMethod;
+	
+	private double zoom = 1.0;
 
 	/**
 	 * The constructor.
@@ -83,38 +94,59 @@ public class VFTView extends ViewPart {
 		// Add JFrame in plug-in view
 		Composite composite = new Composite(parent, SWT.EMBEDDED | SWT.NO_BACKGROUND);
 		Frame frame = SWT_AWT.new_Frame(composite);
-		JSplitPane splitPaneV = new JSplitPane( JSplitPane.VERTICAL_SPLIT);
+		JSplitPane splitPaneV = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
+		splitPaneV.setDividerLocation(500);
 		
-		JTabbedPane tabPane = new JTabbedPane();
+		tabPane = new JTabbedPane();
 		
 		// Add Panel for graph
-		graphPanel = new JPanel();
+		graphPanel = new JPanel(new BorderLayout());
 		
 		// Add Graph
 		filterRule = 0;
 		options = new ArrayList<String>();
-		ListenableGraph<String, String> g = VFTGraph.init(filterRule, options);
-		JGraphXAdapter<String, String> graphAdapter = 
-				new JGraphXAdapter<String, String>(g);
-		mxIGraphLayout layout = new mxCircleLayout(graphAdapter);
-		layout.execute(graphAdapter.getDefaultParent());
-		graphPanel.add(new mxGraphComponent(graphAdapter));
+		drawGraph(filterRule, options);
 		
 		// Add Panel for Tree
-		treePanel = new JPanel();
+		treePanel = new JPanel(new BorderLayout());
 		
 		// Add Tree
 		treePanel.add(VFTTree.init(filterRule, options));
 		
-		tabPane.addTab("VFT Graph", graphPanel);
+		tabPane.addTab("VFT Graph", new JScrollPane(graphPanel));
 		tabPane.addTab("VFT Tree", treePanel);
 		
 		selectPane = new JPanel();
 		drawInitialSelectPane();
 		
-		splitPaneV.setLeftComponent(tabPane);
-		splitPaneV.setRightComponent(selectPane);
+		splitPaneV.setTopComponent(tabPane);
+		splitPaneV.setBottomComponent(selectPane);
+		
 		frame.add(splitPaneV);
+		
+	}
+	
+	private void drawGraph(int filterRule, ArrayList<String> options) {
+		
+		ListenableGraph<String, String> g = VFTGraph.init(filterRule, options);
+		JGraphXAdapter<String, String> graphAdapter = 
+				new JGraphXAdapter<String, String>(g);
+
+		Object[] edgeCellArray = new Object[graphAdapter.getEdgeToCellMap().size()];
+		for (int i = 0; i < graphAdapter.getEdgeToCellMap().size(); ++i) {
+		  edgeCellArray[i] = (Object)(graphAdapter.getEdgeToCellMap().get(g.edgeSet().toArray()[i]));
+		}
+		graphAdapter.setCellStyle("fontSize=5", edgeCellArray);
+		
+		mxHierarchicalLayout layout = new mxHierarchicalLayout(graphAdapter);
+		layout.setInterHierarchySpacing(5.0);
+		layout.setInterRankCellSpacing(150.0);
+		layout.setIntraCellSpacing(15.0);
+		layout.execute(graphAdapter.getDefaultParent());
+		
+		mxGraphComponent test = new mxGraphComponent(graphAdapter);
+
+		graphPanel.add(test);
 		
 	}
 	
@@ -153,6 +185,13 @@ public class VFTView extends ViewPart {
 	                    	packageTo = packageBoxTo.getSelectedItem().toString();
 	                    }
 	                });
+	            	options.clear();
+	            	if (packageFrom == null && packageTo == null) {
+	                	graphPanel.removeAll();
+	                	drawGraph(filterRule, options);
+	            		graphPanel.revalidate();
+	            		graphPanel.repaint();
+	            	}
 	            	selectPane.add(packageBoxFrom);
 	            	selectPane.add(packageBoxTo);
             	} else if (filterRule == Filter.FILE_FILTER) {
@@ -164,6 +203,13 @@ public class VFTView extends ViewPart {
 	                    	file = fileBox.getSelectedItem().toString();
 	                    }
 	                });
+	            	options.clear();
+	            	if (file == null) {
+	                	graphPanel.removeAll();
+	                	drawGraph(filterRule, options);
+	            		graphPanel.revalidate();
+	            		graphPanel.repaint();
+	            	}
 	            	selectPane.add(fileBox);
             	} else if (filterRule == Filter.TEST_CASE_FILTER) {
 	            	ArrayList<String> componentList = Filter.setFilterRule(Filter.TEST_CASE_FILTER);
@@ -232,12 +278,7 @@ public class VFTView extends ViewPart {
             	}
             	
             	graphPanel.removeAll();
-        		ListenableGraph<String, String> g = VFTGraph.init(filterRule, options);
-        		JGraphXAdapter<String, String> graphAdapter = 
-        				new JGraphXAdapter<String, String>(g);
-        		mxIGraphLayout layout = new mxCircleLayout(graphAdapter);
-        		layout.execute(graphAdapter.getDefaultParent());
-        		graphPanel.add(new mxGraphComponent(graphAdapter));
+            	drawGraph(filterRule, options);
         		graphPanel.revalidate();
         		graphPanel.repaint();
         		
@@ -249,8 +290,20 @@ public class VFTView extends ViewPart {
             }
         });
 		
+		/*
+		Button b = new Button("Zoom");
+		b.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+            	System.out.println(graphPanel.getWidth());
+            }
+        });
+		Button c = new Button("Export");
+		*/
+		
 		selectPane.add(a);
 		selectPane.add(comboBox);
+		//selectPane.add(b);
 	}
 	
 	/**
@@ -259,4 +312,5 @@ public class VFTView extends ViewPart {
 	public void setFocus() {
 		//viewer.getControl().setFocus();
 	}
+	
 }
