@@ -35,7 +35,9 @@ package vft.parser;
  	 private Element xml_root; 
  	 private ArrayList<Arch_Channel> parsed_Arch; 
  	 private ArrayList<LogData> parsed_LogData; 
- 	  
+ 	 private String ArchitectureFileName = "ATMSimulationSystemXML_2016_05_10.txt";
+ 	 private String LogFileName = "PO_log_20160510_2024.txt";
+ 	 
  	 public parser() throws SAXException, IOException{ 
  		  
  		 URL classURL = getClass().getProtectionDomain().getCodeSource().getLocation(); 
@@ -49,7 +51,7 @@ package vft.parser;
  	 
  			 xml_parser = dbf.newDocumentBuilder(); 
  	 
- 			 xml_doc = xml_parser.parse(path + "logs/ATMSimulationSystemXML_2016_05_10.txt"); 
+ 			 xml_doc = xml_parser.parse(path + "logs/" + ArchitectureFileName); 
  	 
  			 xml_root = xml_doc.getDocumentElement(); 
  			  
@@ -64,7 +66,7 @@ package vft.parser;
  		  
  		  
  		 //log parsing 
- 		 File logFile = new File(path + "logs/PO_log_20160510_2024.txt"); 
+ 		 File logFile = new File(path + "logs/" + LogFileName); 
  		 FileReader fileReader = new FileReader(logFile); 
  		 BufferedReader reader = new BufferedReader(fileReader); 
  		  
