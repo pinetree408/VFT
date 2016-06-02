@@ -62,8 +62,12 @@ public class FilterWrapper extends Filter {
 		return super.setInterface(interfaceName);			
 	}
 
-	public void prepareLogData () {
-		super.prepareLogData();			
+	public boolean prePareTextTreeData (String testCaseName) {
+		return super.prePareTextTreeData(testCaseName);			
+	}
+
+	public void prePareLogData () {
+		super.prePareLogData();			
 	}
 
 	public ArrayList<ErrorInfo> getErrorInfo() {

@@ -44,7 +44,7 @@ public class Filter {
 	}
 
 
-	public void prepareLogData () {		
+	public void prePareLogData () {		
 		//collect basic information here -> architecture data(architectureData) and log data
 		collectFilterInfoForFirstPage();
 	}
@@ -191,7 +191,6 @@ public class Filter {
 		boolean ret = false;
  
 		graphNode.clear();
-		textualNode.clear();
 		Arch_Channel tempArch;
 		LogData tempLogData;
 		GraphNode gNodeTemp;
@@ -298,7 +297,7 @@ public class Filter {
 			            }			            
 		            }		            
 	        	}	        	
-	        }	        	
+	        }
 		}
 		else if (filterRule == TEST_METHOD_FILTER) { 
 			setInterfaceNode(inputParam1);			
@@ -359,8 +358,77 @@ public class Filter {
 		return setInterfaceNode(selectedInterface);		
 	}
 
-	protected boolean setTextualNode() {
-		throw new UnsupportedOperationException("The method is not implemented yet.");
+	protected boolean prePareTextTreeData(String testCaseName) {
+		boolean ret = false;
+		boolean mGroupOpenClose = false; 
+		int i;
+		LogData tempLogData;
+		LogData tempLogDataBackup = parsedArch.new LogData(testCaseName);
+		TextualNode gTextualTemp = null;
+		TextualNode gTextualInnerTemp = null;
+		String mCalledClassName;
+		String mfunctionName;
+		
+		textualNode.clear(); 
+		for(i = 0; i < pLogData.size(); i++) {
+			tempLogData = pLogData.get(i);
+			if (tempLogData.testSuiteName.equals(testCaseName)) {
+				if (tempLogData.action.equals(tempLogDataBackup.action) && 
+						tempLogData.lineNumber.equals(tempLogDataBackup.lineNumber) &&
+						tempLogData.fileName.equals(tempLogDataBackup.fileName) && 
+						tempLogData.inputParams.equals(tempLogDataBackup.inputParams) &&
+						tempLogData.functionName.equals(tempLogDataBackup.functionName)) { //skip duplicated log
+					continue;
+				} else {
+					String[] splitText = tempLogData.calledClass.split("[.]");
+					mCalledClassName = splitText[splitText.length - 1]+".java";
+					if (tempLogData.functionName.equals("<init>"))
+						mfunctionName =  splitText[splitText.length - 1];
+					else
+						mfunctionName =  tempLogData.functionName;
+	
+					if (tempLogData.action.equals("call") && tempLogData.calledClass.startsWith("com.atmsimulation")) {
+						if (gTextualTemp != null && mGroupOpenClose == true) {
+							textualNode.add(gTextualTemp);
+							mGroupOpenClose = false;
+							ret = true;
+						}
+						gTextualTemp = new TextualNode();
+						gTextualTemp.action = tempLogData.action;
+						gTextualTemp.caller = tempLogData.fileName;
+						gTextualTemp.callee = mCalledClassName;
+						gTextualTemp.lineNumber = tempLogData.lineNumber;
+						gTextualTemp.functionName = mfunctionName;
+						gTextualTemp.param = tempLogData.inputParams;
+						gTextualTemp.innerAction = new ArrayList<TextualNode>();
+						mGroupOpenClose = true;
+					} else if (!tempLogData.action.equals("null") && tempLogData.calledClass.startsWith("com.atmsimulation")) {
+						if (gTextualTemp != null && mGroupOpenClose == true) {
+							gTextualInnerTemp = new TextualNode();
+							gTextualInnerTemp.action = tempLogData.action;
+							gTextualInnerTemp.caller = tempLogData.fileName;
+							gTextualInnerTemp.callee = mCalledClassName;
+							gTextualInnerTemp.lineNumber = tempLogData.lineNumber;
+							gTextualInnerTemp.functionName = mfunctionName;
+							gTextualInnerTemp.param = tempLogData.inputParams;
+							gTextualTemp.innerAction.add(gTextualInnerTemp);
+						}
+					} else {
+	    	            System.out.println("Filter : Log Err - The action is null or interface to external module. Don't add this log to text tree.");					
+					}				
+				}
+				tempLogDataBackup.action = tempLogData.action;
+				tempLogDataBackup.lineNumber = tempLogData.lineNumber;
+				tempLogDataBackup.fileName = tempLogData.fileName;
+				tempLogDataBackup.inputParams = tempLogData.inputParams;
+				tempLogDataBackup.functionName = tempLogData.functionName;
+        	}
+				
+		}
+		if (gTextualTemp != null && mGroupOpenClose == true) {
+			textualNode.add(gTextualTemp);
+		}		 
+		return ret;
 	}
 
 	protected boolean setErrorInfo() {
@@ -391,8 +459,12 @@ public class Filter {
 		public String param;
 	}
 	public class TextualNode{
-		public String functionName;
-		public String contentsInfo;
-		public TextualNode textualNode;
+		public String action; //call
+		public String functionName; 
+		public String caller;
+		public String callee;
+		public String lineNumber;
+		public String param;  // input parameter
+		public ArrayList<TextualNode> innerAction; //array list for inner actions - set, execution, preinitialization ..
 	}
 }

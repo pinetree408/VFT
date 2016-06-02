@@ -7,6 +7,7 @@ import javax.swing.tree.DefaultMutableTreeNode;
 
 import vft.filter.FilterWrapper;
 import vft.filter.Filter.GraphNode;
+import vft.filter.Filter.TextualNode;
 
 public class VFTTree {
 
@@ -35,6 +36,7 @@ public class VFTTree {
     	DefaultMutableTreeNode callee;
     	
     	ArrayList<GraphNode> graphNode = new ArrayList<GraphNode>();
+    	ArrayList<TextualNode> textualNode = new ArrayList<TextualNode>();
     	ArrayList<String> componentList;
         FilterWrapper Filter = new FilterWrapper();        
         int i;
@@ -101,6 +103,28 @@ public class VFTTree {
 	            root.add(caller);
 	            System.out.println("VFTGraph :  " + gNodeToDebug.caller + " -> " + gNodeToDebug.functionName + " -> " + gNodeToDebug.callee);
 	        }
+	        
+
+	        System.out.println("VFTGraph : ##### call text tree involved with this test case #####");
+	        Filter.prePareTextTreeData(options.get(0));
+	        textualNode = Filter.getTextualNode();
+	        TextualNode gTextualTemp = null;
+	        TextualNode gTextualInnerTemp = null;
+	        for (i = 0; i < textualNode.size(); i++) {
+	        	int j;
+	        	gTextualTemp = textualNode.get(i);
+	        	System.out.println("VFTGraph :  call  " + gTextualTemp.action + "  " + gTextualTemp.caller + "  " + gTextualTemp.lineNumber + "  " 
+    	        		+ gTextualTemp.callee + "  " + gTextualTemp.functionName + "  " + gTextualTemp.param);	
+	        	if(gTextualTemp.innerAction.size() > 0) {
+    				for(j = 0; j < gTextualTemp.innerAction.size(); j++) {
+    					gTextualInnerTemp = gTextualTemp.innerAction.get(j);
+    			        System.out.println("VFTGraph :  inner  " + gTextualInnerTemp.action + "  " 
+    			        		+ gTextualInnerTemp.caller + "  " + gTextualInnerTemp.lineNumber + "  "  
+    			        		+ gTextualInnerTemp.callee + "  " + gTextualInnerTemp.functionName + "  " + gTextualInnerTemp.param);	
+    				}
+    	        }
+	        }
+	        
         } else if (filteringRule == Filter.TEST_METHOD_FILTER) {
         	
         	root = new DefaultMutableTreeNode("TEST_METHOD_FILTER");
