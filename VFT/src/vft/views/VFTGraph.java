@@ -48,7 +48,7 @@ public class VFTGraph {
         FilterWrapper Filter = new FilterWrapper();        
         int i;
         String tmpList;          
-        Filter.prePareLogData();
+        Filter.prepareLogData();
  
         // 1st step : set filter rule and get list
         componentList = Filter.setFilterRule(Filter.INTER_COMPONENT_FILTER);
@@ -88,7 +88,7 @@ public class VFTGraph {
 		            gNodeToDebug = graphNode.get(i);
 		            g.addVertex(gNodeToDebug.caller);
 		            g.addVertex(gNodeToDebug.callee);
-		            g.addEdge(gNodeToDebug.caller, gNodeToDebug.callee, gNodeToDebug.functionName);
+		            g.addEdge(gNodeToDebug.caller, gNodeToDebug.callee, gNodeToDebug.functionName + ":" + gNodeToDebug.param);
 		            System.out.println("VFTGraph :  " + gNodeToDebug.caller + " -> " + gNodeToDebug.functionName + " -> " + gNodeToDebug.callee);
 		        }
         	} else {
@@ -107,7 +107,7 @@ public class VFTGraph {
 			            gNodeToDebug = graphNode.get(i);
 			            g.addVertex(gNodeToDebug.caller);
 			            g.addVertex(gNodeToDebug.callee);
-			            g.addEdge(gNodeToDebug.caller, gNodeToDebug.callee, gNodeToDebug.functionName);
+			            g.addEdge(gNodeToDebug.caller, gNodeToDebug.callee, gNodeToDebug.functionName + ":" + gNodeToDebug.param);
 			            System.out.println("VFTGraph :  " + gNodeToDebug.caller + " -> " + gNodeToDebug.functionName + " -> " + gNodeToDebug.callee);
 			        }
         		}
@@ -125,7 +125,7 @@ public class VFTGraph {
 		            gNodeToDebug = graphNode.get(i);
 		            g.addVertex(gNodeToDebug.caller);
 		            g.addVertex(gNodeToDebug.callee);
-		            g.addEdge(gNodeToDebug.caller, gNodeToDebug.callee, gNodeToDebug.functionName);
+		            g.addEdge(gNodeToDebug.caller, gNodeToDebug.callee, gNodeToDebug.functionName + ":" + gNodeToDebug.param);
 		            System.out.println("VFTGraph :  " + gNodeToDebug.caller + " -> " + gNodeToDebug.functionName + " -> " + gNodeToDebug.callee);
 		        }
         	} else {
@@ -140,7 +140,7 @@ public class VFTGraph {
 			            gNodeToDebug = graphNode.get(i);
 			            g.addVertex(gNodeToDebug.caller);
 			            g.addVertex(gNodeToDebug.callee);
-			            g.addEdge(gNodeToDebug.caller, gNodeToDebug.callee, gNodeToDebug.functionName);
+			            g.addEdge(gNodeToDebug.caller, gNodeToDebug.callee, gNodeToDebug.functionName + ":" + gNodeToDebug.param);
 			            System.out.println("VFTGraph :  " + gNodeToDebug.caller + " -> " + gNodeToDebug.functionName + " -> " + gNodeToDebug.callee);
 			        }
         		}
@@ -157,7 +157,7 @@ public class VFTGraph {
 	            gNodeToDebug = graphNode.get(i);
 	            g.addVertex(gNodeToDebug.caller);
 	            g.addVertex(gNodeToDebug.callee);
-	            g.addEdge(gNodeToDebug.caller, gNodeToDebug.callee, gNodeToDebug.functionName);
+	            g.addEdge(gNodeToDebug.caller, gNodeToDebug.callee, gNodeToDebug.functionName + ":" + gNodeToDebug.param);
 	            System.out.println("VFTGraph :  " + gNodeToDebug.caller + " -> " + gNodeToDebug.functionName + " -> " + gNodeToDebug.callee);
 	        }
         } else if (filteringRule == Filter.TEST_METHOD_FILTER) {
@@ -171,12 +171,12 @@ public class VFTGraph {
 	            gNodeToDebug = graphNode.get(i);
 	            g.addVertex(gNodeToDebug.caller);
 	            g.addVertex(gNodeToDebug.callee);
-	            g.addEdge(gNodeToDebug.caller, gNodeToDebug.callee, gNodeToDebug.functionName);
+	            g.addEdge(gNodeToDebug.caller, gNodeToDebug.callee, gNodeToDebug.functionName + ":" + gNodeToDebug.param);
 	            System.out.println("VFTGraph :  " + gNodeToDebug.caller + " -> " + gNodeToDebug.functionName + " -> " + gNodeToDebug.callee);
 	        }
         	
         } else {
-        	
+        	/*
         	String vertex = String.valueOf(filteringRule);
             String v1 = vertex;
             String v2 = vertex + "1";
@@ -194,6 +194,7 @@ public class VFTGraph {
             g.addEdge(v2, v3, v2 + v3);
             g.addEdge(v3, v1, v3 + v4);
             g.addEdge(v4, v3, v4 + v3);
+            */
         }
 
         long end = System.currentTimeMillis();	     

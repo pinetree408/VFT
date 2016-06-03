@@ -2,30 +2,36 @@ package vft.parser;
 
 
  import java.io.BufferedReader; 
- import java.io.File; 
- import java.io.FileNotFoundException; 
- import java.io.FileReader; 
- import java.io.IOException; 
- import java.net.URL; 
- import java.nio.file.Paths; 
- import java.util.ArrayList; 
- import java.util.Enumeration; 
- import java.util.List; 
- import java.util.Properties; 
- import java.util.regex.Matcher; 
- import java.util.regex.Pattern; 
+import java.io.File; 
+import java.io.FileNotFoundException; 
+import java.io.FileReader; 
+import java.io.IOException; 
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.URL; 
+import java.nio.file.Paths; 
+import java.util.ArrayList; 
+import java.util.Enumeration; 
+import java.util.List; 
+import java.util.Properties; 
+import java.util.regex.Matcher; 
+import java.util.regex.Pattern; 
  
+
+
 
  import javax.xml.parsers.DocumentBuilder; 
- import javax.xml.parsers.DocumentBuilderFactory; 
- import javax.xml.parsers.ParserConfigurationException; 
+import javax.xml.parsers.DocumentBuilderFactory; 
+import javax.xml.parsers.ParserConfigurationException; 
  
 
+
+
  import org.w3c.dom.Document; 
- import org.w3c.dom.Element; 
- import org.w3c.dom.Node; 
- import org.w3c.dom.NodeList; 
- import org.xml.sax.SAXException; 
+import org.w3c.dom.Element; 
+import org.w3c.dom.Node; 
+import org.w3c.dom.NodeList; 
+import org.xml.sax.SAXException; 
  
 
  public class parser { 
@@ -40,9 +46,9 @@ package vft.parser;
  	 
  	 public parser() throws SAXException, IOException{ 
  		  
- 		 URL classURL = getClass().getProtectionDomain().getCodeSource().getLocation(); 
- 		 String path = classURL.toString(); 
- 		 path = path.replace("file:/", ""); 
+ 		 //URL classURL = getClass().getProtectionDomain().getCodeSource().getLocation(); 
+ 		 //String path = classURL.toString(); 
+ 		 //path = path.replace("file:/", ""); 
  		 		  
  		 //xml parsing 
  		 try{ 
@@ -51,7 +57,7 @@ package vft.parser;
  	 
  			 xml_parser = dbf.newDocumentBuilder(); 
  	 
- 			 xml_doc = xml_parser.parse(path + "logs/" + ArchitectureFileName); 
+ 			 xml_doc = xml_parser.parse(parser.class.getResourceAsStream("/logs/ATMSimulationSystemXML_2016_05_10.txt")); 
  	 
  			 xml_root = xml_doc.getDocumentElement(); 
  			  
@@ -66,9 +72,8 @@ package vft.parser;
  		  
  		  
  		 //log parsing 
- 		 File logFile = new File(path + "logs/" + LogFileName); 
- 		 FileReader fileReader = new FileReader(logFile); 
- 		 BufferedReader reader = new BufferedReader(fileReader); 
+ 		 InputStream input = parser.class.getResourceAsStream("/logs/PO_log_20160510_2024.txt");
+ 		 BufferedReader reader = new BufferedReader(new InputStreamReader(input)); 
  		  
  		 String line = null; 
  		 parsed_LogData = new ArrayList<LogData>(); 
