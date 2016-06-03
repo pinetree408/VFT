@@ -39,7 +39,7 @@ public class VFTTree {
         FilterWrapper Filter = new FilterWrapper();        
         int i;
         String tmpList;          
-        Filter.prePareLogData();
+        Filter.prepareLogData();
         
         // 2nd step : select package or file or test case
         if (filteringRule == Filter.INTER_COMPONENT_FILTER) {

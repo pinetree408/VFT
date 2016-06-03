@@ -136,11 +136,11 @@ public class VFTView extends ViewPart {
 		for (int i = 0; i < graphAdapter.getEdgeToCellMap().size(); ++i) {
 		  edgeCellArray[i] = (Object)(graphAdapter.getEdgeToCellMap().get(g.edgeSet().toArray()[i]));
 		}
-		graphAdapter.setCellStyle("fontSize=5", edgeCellArray);
+		graphAdapter.setCellStyle("fontSize=3", edgeCellArray);
 		
 		mxHierarchicalLayout layout = new mxHierarchicalLayout(graphAdapter);
 		layout.setInterHierarchySpacing(5.0);
-		layout.setInterRankCellSpacing(150.0);
+		layout.setInterRankCellSpacing(100.0);
 		layout.setIntraCellSpacing(15.0);
 		layout.execute(graphAdapter.getDefaultParent());
 		
@@ -160,7 +160,7 @@ public class VFTView extends ViewPart {
             	filterRule = comboBox.getSelectedIndex();
 
             	FilterWrapper Filter = new FilterWrapper();
-            	Filter.prePareLogData();
+            	Filter.prepareLogData();
 
         		if (selectPane.getComponentCount() == 4) {
         			selectPane.remove(selectPane.getComponentCount() - 1);
@@ -245,7 +245,7 @@ public class VFTView extends ViewPart {
             public void actionPerformed(ActionEvent e) {
             	options.clear();
             	FilterWrapper Filter = new FilterWrapper();
-            	Filter.prePareLogData();
+            	Filter.prepareLogData();
             	if (filterRule == Filter.INTER_COMPONENT_FILTER) {
             		if (packageFrom == null){
     	            	ArrayList<String> componentList = Filter.setFilterRule(Filter.INTER_COMPONENT_FILTER);
