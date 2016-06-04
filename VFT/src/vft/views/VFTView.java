@@ -10,6 +10,7 @@ import java.awt.Button;
 import java.awt.Dimension;
 import java.awt.Frame;
 import java.awt.GridBagLayout;
+import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
@@ -19,6 +20,8 @@ import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 
 import javax.swing.JComboBox;
+import javax.swing.JDialog;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
@@ -31,11 +34,15 @@ import org.eclipse.swt.SWT;
 
 // Import Lib for Graph
 import org.jgrapht.ListenableGraph;
+import org.jgrapht.event.GraphEdgeChangeEvent;
 import org.jgrapht.ext.JGraphXAdapter;
 import org.jgrapht.graph.DirectedMultigraph;
 
 import com.mxgraph.layout.hierarchical.mxHierarchicalLayout;
+import com.mxgraph.model.mxCell;
 import com.mxgraph.swing.mxGraphComponent;
+import com.mxgraph.util.mxEvent;
+import com.mxgraph.util.mxEventSource.mxIEventListener;
 
 import java.util.ArrayList;
 
@@ -64,6 +71,8 @@ public class VFTView extends ViewPart {
 	 */
 	public static final String ID = "vft.views.VFTView";
 
+	private Frame frame;
+	
 	private JPanel graphPanel;
 	private JPanel treePanel;
 	private JPanel selectPane;
@@ -93,7 +102,7 @@ public class VFTView extends ViewPart {
 		
 		// Add JFrame in plug-in view
 		Composite composite = new Composite(parent, SWT.EMBEDDED | SWT.NO_BACKGROUND);
-		Frame frame = SWT_AWT.new_Frame(composite);
+		frame = SWT_AWT.new_Frame(composite);
 		JSplitPane splitPaneV = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
 		splitPaneV.setDividerLocation(500);
 		
@@ -145,6 +154,27 @@ public class VFTView extends ViewPart {
 		layout.execute(graphAdapter.getDefaultParent());
 		
 		mxGraphComponent test = new mxGraphComponent(graphAdapter);
+		test.getGraphControl().addMouseListener(new MouseAdapter()
+        {
+            @Override
+            public void mousePressed(MouseEvent e)
+            {
+            	Object cell = test.getCellAt(e.getX(), e.getY());
+            	if (cell instanceof mxCell) {
+            		String testString = ((mxCell) cell).getValue().toString();
+            		
+            		JDialog testDia = new JDialog();
+            		testDia.setLocation(100 + e.getX(), 100 + e.getY());
+            		testDia.setSize(150, 150);
+            		testDia.setTitle("test");
+            		JPanel messagePane = new JPanel();
+            	    messagePane.add(new JLabel(testString));
+            		testDia.add(messagePane);
+            		testDia.pack();
+            		testDia.setVisible(true);
+            	}
+            }
+        });
 
 		graphPanel.add(test);
 		

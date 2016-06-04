@@ -199,7 +199,6 @@ public class VFTGraph {
 
         long end = System.currentTimeMillis();	     
 		System.out.println("VFTGraph : Filter  (ms) " +  (end - start)); 
-        System.out.println(g.toString());
         
         return g;
 
