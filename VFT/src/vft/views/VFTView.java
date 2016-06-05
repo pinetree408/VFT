@@ -10,6 +10,7 @@ import java.awt.Button;
 import java.awt.Dimension;
 import java.awt.Frame;
 import java.awt.GridBagLayout;
+import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
@@ -19,10 +20,13 @@ import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 
 import javax.swing.JComboBox;
+import javax.swing.JDialog;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
+import javax.swing.JTextField;
 
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.part.*;
@@ -31,11 +35,15 @@ import org.eclipse.swt.SWT;
 
 // Import Lib for Graph
 import org.jgrapht.ListenableGraph;
+import org.jgrapht.event.GraphEdgeChangeEvent;
 import org.jgrapht.ext.JGraphXAdapter;
 import org.jgrapht.graph.DirectedMultigraph;
 
 import com.mxgraph.layout.hierarchical.mxHierarchicalLayout;
+import com.mxgraph.model.mxCell;
 import com.mxgraph.swing.mxGraphComponent;
+import com.mxgraph.util.mxEvent;
+import com.mxgraph.util.mxEventSource.mxIEventListener;
 
 import java.util.ArrayList;
 
@@ -64,6 +72,8 @@ public class VFTView extends ViewPart {
 	 */
 	public static final String ID = "vft.views.VFTView";
 
+	private Frame frame;
+	
 	private JPanel graphPanel;
 	private JPanel treePanel;
 	private JPanel selectPane;
@@ -76,8 +86,6 @@ public class VFTView extends ViewPart {
 	private String file;
 	private String testCase;
 	private String testMethod;
-	
-	private double zoom = 1.0;
 
 	/**
 	 * The constructor.
@@ -93,7 +101,7 @@ public class VFTView extends ViewPart {
 		
 		// Add JFrame in plug-in view
 		Composite composite = new Composite(parent, SWT.EMBEDDED | SWT.NO_BACKGROUND);
-		Frame frame = SWT_AWT.new_Frame(composite);
+		frame = SWT_AWT.new_Frame(composite);
 		JSplitPane splitPaneV = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
 		splitPaneV.setDividerLocation(500);
 		
@@ -123,7 +131,7 @@ public class VFTView extends ViewPart {
 		splitPaneV.setBottomComponent(selectPane);
 		
 		frame.add(splitPaneV);
-		
+	
 	}
 	
 	private void drawGraph(int filterRule, ArrayList<String> options) {
@@ -137,6 +145,12 @@ public class VFTView extends ViewPart {
 		  edgeCellArray[i] = (Object)(graphAdapter.getEdgeToCellMap().get(g.edgeSet().toArray()[i]));
 		}
 		graphAdapter.setCellStyle("fontSize=3", edgeCellArray);
+		graphAdapter.setEnabled(false);
+		graphAdapter.setConnectableEdges(false);
+		graphAdapter.setCellsMovable(false);
+		graphAdapter.setCellsResizable(false);
+		graphAdapter.setCellsEditable(false);
+		graphAdapter.setAllowDanglingEdges(false);
 		
 		mxHierarchicalLayout layout = new mxHierarchicalLayout(graphAdapter);
 		layout.setInterHierarchySpacing(5.0);
@@ -145,6 +159,32 @@ public class VFTView extends ViewPart {
 		layout.execute(graphAdapter.getDefaultParent());
 		
 		mxGraphComponent test = new mxGraphComponent(graphAdapter);
+		test.getGraphControl().addMouseListener(new MouseAdapter()
+        {
+            @Override
+            public void mousePressed(MouseEvent e)
+            {
+            	Object cell = test.getCellAt(e.getX(), e.getY());
+            	if (cell instanceof mxCell) {
+            		String cellTitle = ((mxCell) cell).getValue().toString();
+            		
+            		JDialog infoDia = new JDialog();
+            		infoDia.setLocation(100 + e.getX(), 100 + e.getY());
+            		infoDia.setTitle(String.valueOf(filterRule));
+            		JPanel messagePane = new JPanel();
+            		JTextField textField = new JTextField(cellTitle);
+            		textField.setEditable(false);
+            		textField.setSize(120, 120);
+            	    messagePane.add(textField);
+            	    messagePane.setSize(120, 120);
+            		infoDia.add(messagePane);
+            		infoDia.pack();
+            		infoDia.setModal(true);
+            		infoDia.setVisible(true);
+
+            	}
+            }
+        });
 
 		graphPanel.add(test);
 		

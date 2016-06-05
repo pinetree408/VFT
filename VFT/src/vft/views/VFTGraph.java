@@ -2,7 +2,6 @@ package vft.views;
 
 import org.jgrapht.ListenableGraph;
 import org.jgrapht.graph.ListenableDirectedGraph;
-import org.jgrapht.graph.DirectedMultigraph;
 
 import java.util.ArrayList;
 
@@ -199,7 +198,6 @@ public class VFTGraph {
 
         long end = System.currentTimeMillis();	     
 		System.out.println("VFTGraph : Filter  (ms) " +  (end - start)); 
-        System.out.println(g.toString());
         
         return g;
 
