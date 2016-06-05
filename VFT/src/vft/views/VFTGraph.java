@@ -2,7 +2,6 @@ package vft.views;
 
 import org.jgrapht.ListenableGraph;
 import org.jgrapht.graph.ListenableDirectedGraph;
-import org.jgrapht.graph.DirectedMultigraph;
 
 import java.util.ArrayList;
 
