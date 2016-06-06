@@ -19,21 +19,23 @@ public class Filter {
     public static ArrayList<String> packageList = new ArrayList<String>(); //for Inter-package filter
     public static ArrayList<String> fileList = new ArrayList<String>(); //for File filter
     public static ArrayList<String> testCaseList = new ArrayList<String>(); //for Test Case filter
+    public static ArrayList<String> functionListForTC = new ArrayList<String>(); //for Test Case filter
     public static ArrayList<String> testMethodList = new ArrayList<String>(); //for Test Method filter
 
     public static String interfaceName;
     public static ArrayList<ErrorInfo> errorInfo = new ArrayList<ErrorInfo>();
     public static ArrayList<GraphNode> graphNode = new ArrayList<GraphNode>();
     public static ArrayList<TextualNode> textualNode = new ArrayList<TextualNode>();
+    public static ArrayList<MethodListForTC> methodListForTC = new ArrayList<MethodListForTC>();
     private ArrayList<Arch_Channel> pArchitectureData = new ArrayList<Arch_Channel>();	// parsed architecture data
     private ArrayList<LogData> pLogData = new ArrayList<LogData>();	// parsed log data
-    parser parsedArch = null;
+    parser parsedData = null;
 	
     protected Filter() {  			
 		try {
-			parsedArch = new parser();
-			pArchitectureData = parsedArch.get_pared_Arch();
-			pLogData = parsedArch.get_parsed_LogData();
+			parsedData = new parser();
+			pArchitectureData = parsedData.get_pared_Arch();
+			pLogData = parsedData.get_parsed_LogData();
 		} catch (SAXException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -44,27 +46,11 @@ public class Filter {
 	}
 
 
-	public void prepareLogData () {		
+	public void prePareLogData () {		
 		//collect basic information here -> architecture data(architectureData) and log data
 		collectFilterInfoForFirstPage();
 	}
-	
-	protected ArrayList<String> getPackageList() {
-		return packageList;
-	}	
-	
-	protected ArrayList<String> getFileList() {
-		return fileList;
-	}	
-
-	protected ArrayList<String> getTestCaseList() {		
-		return testCaseList;
-	}
-	
-	protected ArrayList<String> getTestMethodList() {		
-		return testMethodList;
-	}
-	
+		
 	private void collectFilterInfoForFirstPage() {
 		int i, j;
 		LogData tempLogData;
@@ -144,7 +130,6 @@ public class Filter {
         	if (testMethodList.size() == 0) {
 	            if (tempLogData.action.equals("call") &&
 	            		tempLogData.calledClass.startsWith("com.atmsimulation")) {
-	            	String[] splitText = tempLogData.calledClass.split("[.]");
 	    			if (tempLogData.functionName.equals("<init>")) { //constructor call
 	            		testMethodList.add(new String(tempLogData.calledClass));
 	    			} else if (tempLogData.functionName.equals("null")) { //
@@ -186,12 +171,61 @@ public class Filter {
         }		
 	}
 	
+	private void collectFunctionListForTC(String testCaseName) {
+		int i, j;
+		LogData tempLogData;
+		String temp;
+		
+        for(i = 0; i < pLogData.size(); i++) {
+        	tempLogData = pLogData.get(i);
+
+        	if (tempLogData.testSuiteName.equals(testCaseName)) { 
+		    	if (functionListForTC.size() == 0) {
+		            if (tempLogData.action.equals("call")) {
+		    			if (tempLogData.functionName.equals("<init>")) { //constructor call
+		    				functionListForTC.add(new String(tempLogData.calledClass));
+		    			} else if (tempLogData.functionName.equals("null")) { //
+		    	            System.out.println("Filter : Log Err - The functionName is null. Don't add this log to Test Method list.");
+		    			} else {
+		    				functionListForTC.add(new String(tempLogData.calledClass + "." + tempLogData.functionName));
+		    			}
+		            }					
+		    	} else {
+					String mfunctionName = "null";	            	
+					String[] splitText;
+					splitText = tempLogData.calledClass.split("[.]");
+					
+					if (!tempLogData.calledClass.equals("null") && tempLogData.functionName.equals("<init>"))
+						mfunctionName =  splitText[splitText.length - 1];
+					else
+						mfunctionName =  tempLogData.functionName;	        		
+		        	
+		            for(j = 0; j < functionListForTC.size(); j++) {
+		            	temp = functionListForTC.get(j);
+		            	if (temp.endsWith(mfunctionName)) {
+		            		break;
+		            	}
+		            } 
+		            if (functionListForTC.size() == j && 
+		            		tempLogData.action.equals("call")) {
+		    			if (tempLogData.functionName.equals("<init>")) { //constructor call
+		    				functionListForTC.add(new String(tempLogData.calledClass));
+		    			} else if (tempLogData.functionName.equals("null") || mfunctionName.equals("null")) {
+		    	            System.out.println("Filter : Log Err - The functionName is null. Don't add this log to Test Method list.");
+		    			} else {
+		    				functionListForTC.add(new String(tempLogData.calledClass + "." + mfunctionName));    			
+		    			}   
+		            }            				          
+		    	}
+        	}
+        }
+	}
+	
 	protected boolean setArchitectureNode(int filterRule, String inputParam1, String inputParam2) {
 		int i, j;
 		boolean ret = false;
  
 		graphNode.clear();
-		textualNode.clear();
 		Arch_Channel tempArch;
 		LogData tempLogData;
 		GraphNode gNodeTemp;
@@ -298,7 +332,7 @@ public class Filter {
 			            }			            
 		            }		            
 	        	}	        	
-	        }	        	
+	        }
 		}
 		else if (filterRule == TEST_METHOD_FILTER) { 
 			setInterfaceNode(inputParam1);			
@@ -359,10 +393,160 @@ public class Filter {
 		return setInterfaceNode(selectedInterface);		
 	}
 
-	protected boolean setTextualNode() {
-		throw new UnsupportedOperationException("The method is not implemented yet.");
+	protected boolean prePareTestCaseInfo(String testCaseName) {
+		boolean ret = false;
+		
+        collectFunctionListForTC(testCaseName);
+        prePareMethodListForTC(testCaseName);
+        if (functionListForTC.size() > 0 && methodListForTC.size() > 0)
+        	ret = true;
+
+		return ret;
+	}
+	
+	protected boolean prePareTextTreeData(String testCaseName) {
+		boolean ret = false;
+		boolean mGroupOpenClose = false; 
+		int i;
+		LogData tempLogData;
+		LogData tempLogDataBackup = parsedData.new LogData(testCaseName);
+		TextualNode gTextualTemp = null;
+		TextualNode gTextualInnerTemp = null;
+		String mCalledClassName;
+		String mfunctionName;
+		
+		textualNode.clear(); 
+		for(i = 0; i < pLogData.size(); i++) {
+			tempLogData = pLogData.get(i);
+			if (tempLogData.testSuiteName.equals(testCaseName)) {
+				if (tempLogData.action.equals(tempLogDataBackup.action) && 
+						tempLogData.lineNumber.equals(tempLogDataBackup.lineNumber) &&
+						tempLogData.fileName.equals(tempLogDataBackup.fileName) && 
+						tempLogData.inputParams.equals(tempLogDataBackup.inputParams) &&
+						tempLogData.functionName.equals(tempLogDataBackup.functionName)) { //skip duplicated log
+					continue;
+				} else {
+					String[] splitText = tempLogData.calledClass.split("[.]");
+					mCalledClassName = splitText[splitText.length - 1]+".java";
+					if (tempLogData.functionName.equals("<init>"))
+						mfunctionName =  splitText[splitText.length - 1];
+					else
+						mfunctionName =  tempLogData.functionName;
+	
+					if (tempLogData.action.equals("call")) {// && tempLogData.calledClass.startsWith("com.atmsimulation")
+						if (gTextualTemp != null && mGroupOpenClose == true) {
+							textualNode.add(gTextualTemp);
+							mGroupOpenClose = false;
+							ret = true;
+						}
+						gTextualTemp = new TextualNode();
+						gTextualTemp.action = tempLogData.action;
+						gTextualTemp.caller = tempLogData.fileName;
+						gTextualTemp.callee = mCalledClassName;
+						gTextualTemp.lineNumber = tempLogData.lineNumber;
+						gTextualTemp.functionName = mfunctionName;
+						gTextualTemp.param = tempLogData.inputParams;
+						gTextualTemp.innerAction = new ArrayList<TextualNode>();
+						mGroupOpenClose = true;
+					} else if (!tempLogData.action.equals("null")) {// && tempLogData.calledClass.startsWith("com.atmsimulation")
+						if (gTextualTemp != null && mGroupOpenClose == true) {
+							gTextualInnerTemp = new TextualNode();
+							gTextualInnerTemp.action = tempLogData.action;
+							gTextualInnerTemp.caller = tempLogData.fileName;
+							gTextualInnerTemp.callee = mCalledClassName;
+							gTextualInnerTemp.lineNumber = tempLogData.lineNumber;
+							gTextualInnerTemp.functionName = mfunctionName;
+							gTextualInnerTemp.param = tempLogData.inputParams;
+							gTextualTemp.innerAction.add(gTextualInnerTemp);
+						}
+					} else {
+	    	            System.out.println("Filter : Log Err - The action is null. Don't add this log to text tree.");					
+					}				
+				}
+				tempLogDataBackup.action = tempLogData.action;
+				tempLogDataBackup.lineNumber = tempLogData.lineNumber;
+				tempLogDataBackup.fileName = tempLogData.fileName;
+				tempLogDataBackup.inputParams = tempLogData.inputParams;
+				tempLogDataBackup.functionName = tempLogData.functionName;
+        	}
+				
+		}
+		if (gTextualTemp != null && mGroupOpenClose == true) {
+			textualNode.add(gTextualTemp);
+		}		 
+		return ret;
 	}
 
+	private void prePareMethodListForTC(String testCaseName) {
+		boolean mGroupOpenClose = false; 
+		int i;
+		LogData tempLogData;
+		LogData tempLogDataBackup = parsedData.new LogData(testCaseName);
+		MethodListForTC gTextualTemp = null;
+		MethodListForTC gTextualInnerTemp = null;
+		String mCalledClassName;
+		String mfunctionName;
+		
+		methodListForTC.clear(); 
+		for(i = 0; i < pLogData.size(); i++) {
+			tempLogData = pLogData.get(i);
+			if (tempLogData.testSuiteName.equals(testCaseName)) {
+				if (tempLogData.action.equals(tempLogDataBackup.action) && 
+						tempLogData.lineNumber.equals(tempLogDataBackup.lineNumber) &&
+						tempLogData.fileName.equals(tempLogDataBackup.fileName) && 
+						tempLogData.inputParams.equals(tempLogDataBackup.inputParams) &&
+						tempLogData.functionName.equals(tempLogDataBackup.functionName)) { //skip duplicated log
+					continue;
+				} else {
+					String[] splitText = tempLogData.calledClass.split("[.]");
+					mCalledClassName = splitText[splitText.length - 1]+".java";
+					if (tempLogData.functionName.equals("<init>"))
+						mfunctionName =  splitText[splitText.length - 1];
+					else
+						mfunctionName =  tempLogData.functionName;
+	
+					if (tempLogData.action.equals("call")) {// && tempLogData.calledClass.startsWith("com.atmsimulation")
+						if (gTextualTemp != null && mGroupOpenClose == true) {
+							methodListForTC.add(gTextualTemp);
+							mGroupOpenClose = false;
+						}
+						gTextualTemp = new MethodListForTC();
+						gTextualTemp.action = tempLogData.action;
+						gTextualTemp.caller = tempLogData.fileName;
+						gTextualTemp.callee = mCalledClassName;
+						gTextualTemp.lineNumber = tempLogData.lineNumber;
+						gTextualTemp.functionName = mfunctionName;
+						gTextualTemp.param = tempLogData.inputParams;
+						gTextualTemp.innerAction = new ArrayList<MethodListForTC>();
+						mGroupOpenClose = true;
+					} else if (!tempLogData.action.equals("null")) {// && tempLogData.calledClass.startsWith("com.atmsimulation")
+						if (gTextualTemp != null && mGroupOpenClose == true) {
+							gTextualInnerTemp = new MethodListForTC();
+							gTextualInnerTemp.action = tempLogData.action;
+							gTextualInnerTemp.caller = tempLogData.fileName;
+							gTextualInnerTemp.callee = mCalledClassName;
+							gTextualInnerTemp.lineNumber = tempLogData.lineNumber;
+							gTextualInnerTemp.functionName = mfunctionName;
+							gTextualInnerTemp.param = tempLogData.inputParams;
+							gTextualTemp.innerAction.add(gTextualInnerTemp);
+						}
+					} else {
+	    	            System.out.println("Filter : Log Err - The action is null. Don't add this log to text tree.");					
+					}				
+				}
+				tempLogDataBackup.action = tempLogData.action;
+				tempLogDataBackup.lineNumber = tempLogData.lineNumber;
+				tempLogDataBackup.fileName = tempLogData.fileName;
+				tempLogDataBackup.inputParams = tempLogData.inputParams;
+				tempLogDataBackup.functionName = tempLogData.functionName;
+        	}
+				
+		}
+		if (gTextualTemp != null && mGroupOpenClose == true) {
+			methodListForTC.add(gTextualTemp);
+		}	
+		
+	}
 	protected boolean setErrorInfo() {
 		throw new UnsupportedOperationException("The method is not implemented yet.");
 	}
@@ -378,6 +562,30 @@ public class Filter {
 	ArrayList<TextualNode> getTextualNode() {
 		return textualNode;
 	}
+
+	ArrayList<MethodListForTC> getMethodListForTC() {
+		return methodListForTC;
+	}
+
+	protected ArrayList<String> getPackageList() {
+		return packageList;
+	}	
+	
+	protected ArrayList<String> getFileList() {
+		return fileList;
+	}	
+
+	protected ArrayList<String> getTestCaseList() {		
+		return testCaseList;
+	}
+
+	protected ArrayList<String> getFunctionListForTC() {
+		return functionListForTC;
+	}
+
+	protected ArrayList<String> getTestMethodList() {		
+		return testMethodList;
+	}
 	
 	public class ErrorInfo{
 		public String functionName;
@@ -390,9 +598,22 @@ public class Filter {
 		public String callee;
 		public String param;
 	}
+	public class MethodListForTC{
+		public String action; 
+		public String functionName; 
+		public String caller;
+		public String callee;
+		public String lineNumber;
+		public String param; 
+		public ArrayList<MethodListForTC> innerAction;
+	}
 	public class TextualNode{
-		public String functionName;
-		public String contentsInfo;
-		public TextualNode textualNode;
+		public String action; 
+		public String functionName; 
+		public String caller;
+		public String callee;
+		public String lineNumber;
+		public String param; 
+		public ArrayList<TextualNode> innerAction;
 	}
 }

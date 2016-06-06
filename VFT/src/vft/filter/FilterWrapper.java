@@ -62,8 +62,16 @@ public class FilterWrapper extends Filter {
 		return super.setInterface(interfaceName);			
 	}
 
-	public void prepareLogData () {
-		super.prepareLogData();			
+	public boolean prePareTextTreeData (String testCaseName) {
+		return super.prePareTextTreeData(testCaseName);			
+	}
+
+	public boolean prePareTestCaseInfo (String testCaseName) {
+		return super.prePareTestCaseInfo(testCaseName);			
+	}
+
+	public void prePareLogData () {
+		super.prePareLogData();			
 	}
 
 	public ArrayList<ErrorInfo> getErrorInfo() {
@@ -76,6 +84,14 @@ public class FilterWrapper extends Filter {
 
 	public ArrayList<TextualNode> getTextualNode() {
 		return super.getTextualNode();
+	} 
+	
+	public ArrayList<MethodListForTC> getMethodListForTC() { // all action - call, set, execution, etc
+		return super.getMethodListForTC();
+	} 
+	
+	public ArrayList<String> getFunctionListForTC() { // call
+		return super.getFunctionListForTC();
 	} 
 
 }
