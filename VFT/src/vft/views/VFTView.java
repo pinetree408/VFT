@@ -258,6 +258,11 @@ public class VFTView extends ViewPart {
 	                    @Override
 	                    public void actionPerformed(ActionEvent e) {
 	                    	testCase = testCaseBox.getSelectedItem().toString();
+	                    	JComboBox<String> testCaseMethodBox = new JComboBox<String>(componentList.toArray(new String[componentList.size()]));
+	                    	selectPane.add(testCaseMethodBox);
+
+	                		selectPane.revalidate();
+	                		selectPane.repaint();
 	                    }
 	                });
 	            	selectPane.add(testCaseBox);

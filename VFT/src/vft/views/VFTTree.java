@@ -89,21 +89,9 @@ public class VFTTree {
         	root = new DefaultMutableTreeNode("TEST_CASE_FILTER");
         	
 	        Filter.selectComponent(Filter.TEST_CASE_FILTER, options.get(0), null);
-	        graphNode = Filter.getGraphNode();
-	
-	        System.out.println("VFTGraph : ##### call graph involved with this test case #####");
-	        GraphNode gNodeToDebug =  Filter.new GraphNode(); 
-	        for (i = 0; i < graphNode.size(); i++) {
-	            gNodeToDebug = graphNode.get(i);
-	            caller = new DefaultMutableTreeNode(gNodeToDebug.caller);
-	            callee = new DefaultMutableTreeNode(gNodeToDebug.callee);
-	            functionName = new DefaultMutableTreeNode(gNodeToDebug.functionName);            
-	            functionName.add(callee);
-	            caller.add(functionName);
-	            root.add(caller);
-	            System.out.println("VFTGraph :  " + gNodeToDebug.caller + " -> " + gNodeToDebug.functionName + " -> " + gNodeToDebug.callee);
-	        }
 	        
+	    	DefaultMutableTreeNode call;
+	    	DefaultMutableTreeNode inner;
 
 	        System.out.println("VFTGraph : ##### call text tree involved with this test case #####");
 	        Filter.prePareTextTreeData(options.get(0));
@@ -113,16 +101,23 @@ public class VFTTree {
 	        for (i = 0; i < textualNode.size(); i++) {
 	        	int j;
 	        	gTextualTemp = textualNode.get(i);
+	        	call = new DefaultMutableTreeNode(gTextualTemp.action + "  " + gTextualTemp.caller + "  " + gTextualTemp.lineNumber + "  " 
+    	        		+ gTextualTemp.callee + "  " + gTextualTemp.functionName + "  " + gTextualTemp.param);
 	        	System.out.println("VFTGraph :  call  " + gTextualTemp.action + "  " + gTextualTemp.caller + "  " + gTextualTemp.lineNumber + "  " 
     	        		+ gTextualTemp.callee + "  " + gTextualTemp.functionName + "  " + gTextualTemp.param);	
 	        	if(gTextualTemp.innerAction.size() > 0) {
     				for(j = 0; j < gTextualTemp.innerAction.size(); j++) {
     					gTextualInnerTemp = gTextualTemp.innerAction.get(j);
+    					inner = new DefaultMutableTreeNode(gTextualInnerTemp.action + "  " 
+    			        		+ gTextualInnerTemp.caller + "  " + gTextualInnerTemp.lineNumber + "  "  
+    			        		+ gTextualInnerTemp.callee + "  " + gTextualInnerTemp.functionName + "  " + gTextualInnerTemp.param);
+    					call.add(inner);
     			        System.out.println("VFTGraph :  inner  " + gTextualInnerTemp.action + "  " 
     			        		+ gTextualInnerTemp.caller + "  " + gTextualInnerTemp.lineNumber + "  "  
     			        		+ gTextualInnerTemp.callee + "  " + gTextualInnerTemp.functionName + "  " + gTextualInnerTemp.param);	
     				}
     	        }
+	        	root.add(call);
 	        }
 	        
         } else if (filteringRule == Filter.TEST_METHOD_FILTER) {
