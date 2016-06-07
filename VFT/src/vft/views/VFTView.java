@@ -4,6 +4,7 @@ package vft.views;
 import vft.views.VFTGraph;
 import vft.views.VFTTree;
 import vft.filter.FilterWrapper;
+import vft.filter.Filter.TextualNode;
 
 import java.awt.BorderLayout;
 import java.awt.Button;
@@ -200,7 +201,7 @@ public class VFTView extends ViewPart {
             	filterRule = comboBox.getSelectedIndex();
 
             	FilterWrapper Filter = new FilterWrapper();
-            	Filter.prepareLogData();
+            	Filter.prePareLogData();
 
         		if (selectPane.getComponentCount() == 4) {
         			selectPane.remove(selectPane.getComponentCount() - 1);
@@ -258,6 +259,18 @@ public class VFTView extends ViewPart {
 	                    @Override
 	                    public void actionPerformed(ActionEvent e) {
 	                    	testCase = testCaseBox.getSelectedItem().toString();
+	            	        Filter.prePareTextTreeData(testCase);
+	            	        ArrayList<String> test = new ArrayList<String>();
+	            	        ArrayList<TextualNode> textualNode = Filter.getTextualNode();
+	            	        TextualNode gTextualTemp = null;
+	            	        for (int i = 0; i < textualNode.size(); i++) {
+	            	        	gTextualTemp = textualNode.get(i);
+	            	        	test.add(gTextualTemp.functionName);
+	            	        }
+	                    	JComboBox<String> testCaseMethodBox = new JComboBox<String>(test.toArray(new String[test.size()]));
+	                    	selectPane.add(testCaseMethodBox);
+	                		selectPane.revalidate();
+	                		selectPane.repaint();
 	                    }
 	                });
 	            	selectPane.add(testCaseBox);
@@ -285,7 +298,7 @@ public class VFTView extends ViewPart {
             public void actionPerformed(ActionEvent e) {
             	options.clear();
             	FilterWrapper Filter = new FilterWrapper();
-            	Filter.prepareLogData();
+            	Filter.prePareLogData();
             	if (filterRule == Filter.INTER_COMPONENT_FILTER) {
             		if (packageFrom == null){
     	            	ArrayList<String> componentList = Filter.setFilterRule(Filter.INTER_COMPONENT_FILTER);

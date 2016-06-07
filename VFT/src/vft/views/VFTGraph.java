@@ -47,7 +47,7 @@ public class VFTGraph {
         FilterWrapper Filter = new FilterWrapper();        
         int i;
         String tmpList;          
-        Filter.prepareLogData();
+        Filter.prePareLogData();
  
         // 1st step : set filter rule and get list
         componentList = Filter.setFilterRule(Filter.INTER_COMPONENT_FILTER);
