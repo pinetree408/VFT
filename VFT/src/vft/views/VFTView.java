@@ -86,6 +86,7 @@ public class VFTView extends ViewPart {
 	private String packageTo;
 	private String file;
 	private String testCase;
+	private String testCaseMethod;
 	private String testMethod;
 
 	/**
@@ -168,17 +169,14 @@ public class VFTView extends ViewPart {
             	Object cell = test.getCellAt(e.getX(), e.getY());
             	if (cell instanceof mxCell) {
             		String cellTitle = ((mxCell) cell).getValue().toString();
-            		
+
+                	FilterWrapper Filter = new FilterWrapper();
             		JDialog infoDia = new JDialog();
             		infoDia.setLocation(100 + e.getX(), 100 + e.getY());
             		infoDia.setTitle(String.valueOf(filterRule));
-            		JPanel messagePane = new JPanel();
-            		JTextField textField = new JTextField(cellTitle);
-            		textField.setEditable(false);
-            		textField.setSize(120, 120);
-            	    messagePane.add(textField);
-            	    messagePane.setSize(120, 120);
-            		infoDia.add(messagePane);
+            		options.clear();
+            		options.add(cellTitle);
+            		infoDia.add(VFTTree.init(Filter.TEST_METHOD_FILTER, options));
             		infoDia.pack();
             		infoDia.setModal(true);
             		infoDia.setVisible(true);
@@ -193,7 +191,7 @@ public class VFTView extends ViewPart {
 	
 	private void drawInitialSelectPane() {
 		
-		String[] filterRules = { "NONE", "INTER_COMPONENT_FILTER", "FILE_FILTER", "TEST_CASE_FILTE", "TEST_METHOD_FILTER"};
+		String[] filterRules = { "NONE", "INTER_COMPONENT_FILTER", "FILE_FILTER", "TEST_CASE_FILTER", "TEST_METHOD_FILTER"};
         JComboBox<String> comboBox = new JComboBox<String>(filterRules);
         comboBox.addActionListener(new ActionListener() {
             @Override
@@ -259,15 +257,34 @@ public class VFTView extends ViewPart {
 	                    @Override
 	                    public void actionPerformed(ActionEvent e) {
 	                    	testCase = testCaseBox.getSelectedItem().toString();
+	                    	
+	                		if (selectPane.getComponentCount() == 4) {
+	                			selectPane.remove(selectPane.getComponentCount() - 1);
+	                		} 
+	                    	
 	            	        Filter.prePareTextTreeData(testCase);
 	            	        ArrayList<String> test = new ArrayList<String>();
 	            	        ArrayList<TextualNode> textualNode = Filter.getTextualNode();
+
+	    	            	ArrayList<String> methodComponentList = Filter.setFilterRule(Filter.TEST_METHOD_FILTER);
 	            	        TextualNode gTextualTemp = null;
 	            	        for (int i = 0; i < textualNode.size(); i++) {
 	            	        	gTextualTemp = textualNode.get(i);
-	            	        	test.add(gTextualTemp.functionName);
+	            	        	for (int j = 0; j < methodComponentList.size(); j++) {
+		            	        	if (methodComponentList.get(j).contains(gTextualTemp.functionName)) {
+		            	        		if (!test.contains(methodComponentList.get(j))) {
+		            	        			test.add(methodComponentList.get(j));
+		            	        		}
+		            	        	}
+	            	        	}
 	            	        }
 	                    	JComboBox<String> testCaseMethodBox = new JComboBox<String>(test.toArray(new String[test.size()]));
+	                    	testCaseMethodBox.addActionListener(new ActionListener() {
+	    	                    @Override
+	    	                    public void actionPerformed(ActionEvent e) {
+	    	                    	testCaseMethod = testCaseMethodBox.getSelectedItem().toString();
+	    	                    }
+	    	                });
 	                    	selectPane.add(testCaseMethodBox);
 	                		selectPane.revalidate();
 	                		selectPane.repaint();
@@ -322,13 +339,15 @@ public class VFTView extends ViewPart {
     	            	testCase = componentList.get(0);
             		}
             		options.add(testCase);
+            		options.add(testCaseMethod);
             	} else if (filterRule == Filter.TEST_METHOD_FILTER) {
-            		if (testCase == null){
+            		if (testMethod == null){
     	            	ArrayList<String> componentList = Filter.setFilterRule(Filter.TEST_METHOD_FILTER);
     	            	testMethod = componentList.get(0);
             		}
             		options.add(testMethod);
             	}
+            	
             	
             	graphPanel.removeAll();
             	drawGraph(filterRule, options);
