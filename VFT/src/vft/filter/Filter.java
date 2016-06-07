@@ -373,13 +373,15 @@ public class Filter {
 			            	}
 			            }
 			            if (graphNode.size() == j) {
-			        		gNodeTemp = new GraphNode();
-			        		gNodeTemp.caller = tempLogData.fileName;
-			        		gNodeTemp.callee = mCalledClassName;
-		                	gNodeTemp.functionName = mfunctionName;
-		                	gNodeTemp.param = tempLogData.inputParams;
-		            		graphNode.add(gNodeTemp);
-		            		ret = true;
+			            	if (interfaceName.equals(tempLogData.calledClass + "." +mfunctionName)){
+				        		gNodeTemp = new GraphNode();
+				        		gNodeTemp.caller = tempLogData.fileName;
+				        		gNodeTemp.callee = mCalledClassName;
+			                	gNodeTemp.functionName = mfunctionName;
+			                	gNodeTemp.param = tempLogData.inputParams;
+			            		graphNode.add(gNodeTemp);
+			            		ret = true;
+			            	}
 			            }			            
 		            }		            
 	        	}     	

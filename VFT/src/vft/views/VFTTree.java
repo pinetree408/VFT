@@ -122,24 +122,43 @@ public class VFTTree {
 	        
         } else if (filteringRule == Filter.TEST_METHOD_FILTER) {
         	
-        	root = new DefaultMutableTreeNode("TEST_METHOD_FILTER");
+        	root = new DefaultMutableTreeNode(options.get(0));
         	
-	        Filter.selectComponent(Filter.TEST_METHOD_FILTER, options.get(0), null);
-	        graphNode = Filter.getGraphNode();
+    		String[] cellTitleFinal = options.get(0).split(":");
+        	
+	        Filter.selectComponent(Filter.TEST_METHOD_FILTER, cellTitleFinal[0], null);
 	
+	    	DefaultMutableTreeNode call;
+	        
 	        System.out.println("VFTGraph : ##### call graph involved with this test method #####");
-	        GraphNode gNodeToDebug =  Filter.new GraphNode(); 
-	        for (i = 0; i < graphNode.size(); i++) {
-	            gNodeToDebug = graphNode.get(i);
-	            caller = new DefaultMutableTreeNode(gNodeToDebug.caller);
-	            callee = new DefaultMutableTreeNode(gNodeToDebug.callee);
-	            functionName = new DefaultMutableTreeNode(gNodeToDebug.functionName);            
-	            functionName.add(callee);
-	            caller.add(functionName);
-	            root.add(caller);
-	            System.out.println("VFTGraph :  " + gNodeToDebug.caller + " -> " + gNodeToDebug.functionName + " -> " + gNodeToDebug.callee);
+	        
+	        componentList = Filter.setFilterRule(Filter.TEST_CASE_FILTER);
+	        for (int k = 0; k < componentList.size(); k++){
+		        Filter.prePareTextTreeData(componentList.get(k));
+		        textualNode = Filter.getTextualNode();
+		        TextualNode gTextualTemp = null;
+		        TextualNode gTextualInnerTemp = null;
+		        for (i = 0; i < textualNode.size(); i++) {
+		        	int j;
+		        	gTextualTemp = textualNode.get(i);
+		        	System.out.println("VFTGraph :  call  " + gTextualTemp.action + "  " + gTextualTemp.caller + "  " + gTextualTemp.lineNumber + "  " 
+	    	        		+ gTextualTemp.callee + "  " + gTextualTemp.functionName + "  " + gTextualTemp.param);	
+		        	if (cellTitleFinal[0].equals(gTextualTemp.functionName)){
+			        	if(gTextualTemp.innerAction.size() > 0) {
+		    				for(j = 0; j < gTextualTemp.innerAction.size(); j++) {
+		    					gTextualInnerTemp = gTextualTemp.innerAction.get(j);
+		    					call = new DefaultMutableTreeNode(gTextualInnerTemp.action + "  " 
+		    			        		+ gTextualInnerTemp.caller + "  " + gTextualInnerTemp.lineNumber + "  "  
+		    			        		+ gTextualInnerTemp.callee + "  " + gTextualInnerTemp.functionName + "  " + gTextualInnerTemp.param);
+		    					root.add(call);
+		    			        System.out.println("VFTGraph :  inner  " + gTextualInnerTemp.action + "  " 
+		    			        		+ gTextualInnerTemp.caller + "  " + gTextualInnerTemp.lineNumber + "  "  
+		    			        		+ gTextualInnerTemp.callee + "  " + gTextualInnerTemp.functionName + "  " + gTextualInnerTemp.param);	
+		    				}
+		    	        }
+		        	}
+		        }
 	        }
-        	
         } else {
         	
             //create the root node

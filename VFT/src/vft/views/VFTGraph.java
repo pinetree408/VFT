@@ -147,18 +147,33 @@ public class VFTGraph {
 	        
         } else if (filteringRule == Filter.TEST_CASE_FILTER) {
         	
-	        Filter.selectComponent(Filter.TEST_CASE_FILTER, options.get(0), null);
-	        graphNode = Filter.getGraphNode();
-	
-	        System.out.println("VFTGraph : ##### call graph involved with this test case #####");
-	        GraphNode gNodeToDebug =  Filter.new GraphNode(); 
-	        for (i = 0; i < graphNode.size(); i++) {
-	            gNodeToDebug = graphNode.get(i);
-	            g.addVertex(gNodeToDebug.caller);
-	            g.addVertex(gNodeToDebug.callee);
-	            g.addEdge(gNodeToDebug.caller, gNodeToDebug.callee, gNodeToDebug.functionName + ":" + gNodeToDebug.param);
-	            System.out.println("VFTGraph :  " + gNodeToDebug.caller + " -> " + gNodeToDebug.functionName + " -> " + gNodeToDebug.callee);
-	        }
+        	if (options.get(1) == null) {
+		        Filter.selectComponent(Filter.TEST_CASE_FILTER, options.get(0), null);
+		        graphNode = Filter.getGraphNode();
+		
+		        System.out.println("VFTGraph : ##### call graph involved with this test case #####");
+		        GraphNode gNodeToDebug =  Filter.new GraphNode(); 
+		        for (i = 0; i < graphNode.size(); i++) {
+		            gNodeToDebug = graphNode.get(i);
+		            g.addVertex(gNodeToDebug.caller);
+		            g.addVertex(gNodeToDebug.callee);
+		            g.addEdge(gNodeToDebug.caller, gNodeToDebug.callee, gNodeToDebug.functionName + ":" + gNodeToDebug.param);
+		            System.out.println("VFTGraph :  " + gNodeToDebug.caller + " -> " + gNodeToDebug.functionName + " -> " + gNodeToDebug.callee);
+		        }
+        	} else {
+    	        Filter.selectComponent(Filter.TEST_METHOD_FILTER, options.get(1), null);
+    	        graphNode = Filter.getGraphNode();
+    	
+    	        System.out.println("VFTGraph : ##### call graph involved with this test method #####");
+    	        GraphNode gNodeToDebug =  Filter.new GraphNode(); 
+    	        for (i = 0; i < graphNode.size(); i++) {
+    	            gNodeToDebug = graphNode.get(i);
+    	            g.addVertex(gNodeToDebug.caller);
+    	            g.addVertex(gNodeToDebug.callee);
+    	            g.addEdge(gNodeToDebug.caller, gNodeToDebug.callee, gNodeToDebug.functionName + ":" + gNodeToDebug.param);
+    	            System.out.println("VFTGraph :  " + gNodeToDebug.caller + " -> " + gNodeToDebug.functionName + " -> " + gNodeToDebug.callee);
+    	        }
+        	}
         } else if (filteringRule == Filter.TEST_METHOD_FILTER) {
         	
 	        Filter.selectComponent(Filter.TEST_METHOD_FILTER, options.get(0), null);
