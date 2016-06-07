@@ -4,6 +4,7 @@ package vft.views;
 import vft.views.VFTGraph;
 import vft.views.VFTTree;
 import vft.filter.FilterWrapper;
+import vft.filter.Filter.TextualNode;
 
 import java.awt.BorderLayout;
 import java.awt.Button;
@@ -258,7 +259,15 @@ public class VFTView extends ViewPart {
 	                    @Override
 	                    public void actionPerformed(ActionEvent e) {
 	                    	testCase = testCaseBox.getSelectedItem().toString();
-	                    	JComboBox<String> testCaseMethodBox = new JComboBox<String>(componentList.toArray(new String[componentList.size()]));
+	            	        Filter.prePareTextTreeData(testCase);
+	            	        ArrayList<String> test = new ArrayList<String>();
+	            	        ArrayList<TextualNode> textualNode = Filter.getTextualNode();
+	            	        TextualNode gTextualTemp = null;
+	            	        for (int i = 0; i < textualNode.size(); i++) {
+	            	        	gTextualTemp = textualNode.get(i);
+	            	        	test.add(gTextualTemp.functionName);
+	            	        }
+	                    	JComboBox<String> testCaseMethodBox = new JComboBox<String>(test.toArray(new String[test.size()]));
 	                    	selectPane.add(testCaseMethodBox);
 	                		selectPane.revalidate();
 	                		selectPane.repaint();
