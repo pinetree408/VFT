@@ -200,7 +200,7 @@ public class VFTView extends ViewPart {
             	filterRule = comboBox.getSelectedIndex();
 
             	FilterWrapper Filter = new FilterWrapper();
-            	Filter.prepareLogData();
+            	Filter.prePareLogData();
 
         		if (selectPane.getComponentCount() == 4) {
         			selectPane.remove(selectPane.getComponentCount() - 1);
@@ -285,7 +285,7 @@ public class VFTView extends ViewPart {
             public void actionPerformed(ActionEvent e) {
             	options.clear();
             	FilterWrapper Filter = new FilterWrapper();
-            	Filter.prepareLogData();
+            	Filter.prePareLogData();
             	if (filterRule == Filter.INTER_COMPONENT_FILTER) {
             		if (packageFrom == null){
     	            	ArrayList<String> componentList = Filter.setFilterRule(Filter.INTER_COMPONENT_FILTER);
