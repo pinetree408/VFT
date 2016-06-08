@@ -1,15 +1,15 @@
-###Development guideline for VFT
+#Development guideline for VFT
 
 ##Structure of VFT project  
 VFT project consists of parser, view, filter.
 Each parts match vft.parser, vft.filter, (vft, vft.views) packages
 Each packages have following java sourcre code.
 
-#[parser]
+###[parser]
 + vft.parser
     + parser.java
 
-#[filter]
+###[filter]
 + vft.filter
     + FilterWrapper.java => wrapper of filter
     + Filter.java => parent of each filter module
@@ -18,7 +18,7 @@ Each packages have following java sourcre code.
     + TestCaseFilter.java => filter for test case filtering rule
     + TestMethodFilter.java => filter for test method filtering rule
 
-#[view]
+###[view]
 + vft
     + Activator.java => eclipse plug-in activator
 + vft.views
@@ -30,13 +30,13 @@ Each packages have following java sourcre code.
 The main file of Parsing module is "parser.java" file.
 The main class is "parser" defined in "parser.java".
 
-#[First]
+###[First]
 When parser's construct call "parser()" is created in filter's construct call "Filter()", "xml_parsing()" and "log_parsing()" functions are performed.
 These two functions are received log files in "logs" directory.
 The input log files are located in "logs".
 Each logs path is mathced "ArchitectureFileName" and "LogFileName" variable.
 
-#[Second]
+###[Second]
 "xml_parsing()" sets "parsed_Arch" variable with xml parser in java library & architecture file.
 "parsed_Arch" consists of "Arch_channel" classes.
 The "Arch_Channel" class is for Architecture Spec file.
@@ -47,7 +47,7 @@ So the "parsed_Arch" variable in type of "ArrayList of class Arch_Channel" is fi
 The "LogData" class is for log file.
 So the "parsed_LogData" variable in type of "ArrayList of class LogData" is filled by parsing log file.
 
-#[Third]
+###[Third]
 If you want to change the log files, you should set *ArchitectureFileName* and *LogFileName* variable.
 If you want to change parsing rule, you should change "xml_parsing()" and "log_parsing()" function.
 
