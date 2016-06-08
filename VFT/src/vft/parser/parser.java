@@ -35,20 +35,17 @@ import org.xml.sax.SAXException;
  
 
  public class parser { 
+	 
  	 private DocumentBuilderFactory dbf; 
  	 private DocumentBuilder xml_parser; 
  	 private Document xml_doc; 
  	 private Element xml_root; 
  	 private ArrayList<Arch_Channel> parsed_Arch; 
  	 private ArrayList<LogData> parsed_LogData; 
- 	 private String ArchitectureFileName = "ATMSimulationSystemXML_2016_05_10.txt";
- 	 private String LogFileName = "PO_log_20160510_2024.txt";
+ 	 private String ArchitectureFile = "/logs/ATMSimulationSystemXML_2016_05_10.txt";
+ 	 private String LogFile = "/logs/PO_log_20160510_2024.txt";
  	 
  	 public parser() throws SAXException, IOException{ 
- 		  
- 		 //URL classURL = getClass().getProtectionDomain().getCodeSource().getLocation(); 
- 		 //String path = classURL.toString(); 
- 		 //path = path.replace("file:/", ""); 
  		 		  
  		 //xml parsing 
  		 try{ 
@@ -57,7 +54,7 @@ import org.xml.sax.SAXException;
  	 
  			 xml_parser = dbf.newDocumentBuilder(); 
  	 
- 			 xml_doc = xml_parser.parse(parser.class.getResourceAsStream("/logs/ATMSimulationSystemXML_2016_05_10.txt")); 
+ 			 xml_doc = xml_parser.parse(parser.class.getResourceAsStream(ArchitectureFile)); 
  	 
  			 xml_root = xml_doc.getDocumentElement(); 
  			  
@@ -72,7 +69,7 @@ import org.xml.sax.SAXException;
  		  
  		  
  		 //log parsing 
- 		 InputStream input = parser.class.getResourceAsStream("/logs/PO_log_20160510_2024.txt");
+ 		 InputStream input = parser.class.getResourceAsStream(LogFile);
  		 BufferedReader reader = new BufferedReader(new InputStreamReader(input)); 
  		  
  		 String line = null; 
