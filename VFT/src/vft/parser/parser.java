@@ -22,30 +22,31 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException; 
  
 
- public class parser { 
-	 
- 	 public class Arch_Channel{ 
- 		 public String name; 
- 		 public String start; 
- 		 public String end; 
- 		 public ArrayList<String> event; 
- 	 }
-	  
-	 public class LogData{ 
-		 public String testSuiteName; 
-		 public String start; 
-		 public String end; 
-		 public String fileName;  
-		 public String lineNumber;  
-		 public String functionName;  
-		 public String calledClass;  
-		 public String action;           
-		 public String inputParams;   
-		 public String errorMsg; 
-		   
-		 public LogData(String tsName){ 
-			 testSuiteName = tsName; 
-		 } 
+public class parser {
+	// Architecture Class
+	public class Arch_Channel {
+		public String name;
+		public String start;
+		public String end;
+		public ArrayList<String> event;
+	}
+	
+	// Log Class
+	public class LogData{
+		public String testSuiteName;
+		public String fileName;
+		public String lineNumber;
+		public String functionName;
+		public String start;
+		public String end;
+		public String calledClass;
+		public String action;
+		public String inputParams;
+		public String errorMsg;
+		
+		public LogData(String tsName){
+			testSuiteName = tsName;
+		}
 		  
 		 public void set_edge(String node, String edge){ 
 
@@ -147,18 +148,24 @@ import org.xml.sax.SAXException;
  		 
  		 //log parsing
  		 log_parsing(LogFile);
- 	 } 
+ 	 }
  	 
  	 public void xml_parsing(String arcitectureFile) throws SAXException{
  		 
  		 try{ 
+
 			  
  			 dbf = DocumentBuilderFactory.newInstance(); 
  	 
- 			 xml_parser = dbf.newDocumentBuilder(); 
- 	 
- 			 xml_doc = xml_parser.parse(parser.class.getResourceAsStream(arcitectureFile));
- 			  
+ 			 xml_parser = dbf.newDocumentBuilder();
+ 			 InputStream input = parser.class.getResourceAsStream(arcitectureFile);
+
+ 			 if (input == null) {
+ 				 input = parser.class.getResourceAsStream("../test" + arcitectureFile);
+ 			 }
+ 			 
+ 			 xml_doc = xml_parser.parse(input);
+ 			 
  		 }catch(ParserConfigurationException e){ 
  			  
  		 }catch(IOException e) { 
@@ -199,6 +206,9 @@ import org.xml.sax.SAXException;
  	public void log_parsing(String logFile) throws IOException{
  
 		 InputStream input = parser.class.getResourceAsStream(logFile);
+			 if (input == null) {
+ 				 input = parser.class.getResourceAsStream("../test" + logFile);
+ 			 }
 		 BufferedReader reader = new BufferedReader(new InputStreamReader(input)); 
 		  
 		 String line = null; 
