@@ -260,26 +260,26 @@ import org.xml.sax.SAXException;
  		return parsed_Arch;
  	}
  	
- 	 private static String replaceLast(String string, String toReplace, String replacement) {
- 		 int pos = string.lastIndexOf(toReplace);
- 		 if (pos > -1) {
- 			 return string.substring(0, pos)+ replacement + string.substring(pos +   toReplace.length(), string.length());
- 		 } else {
- 			 return string;
- 		 }
- 	 }
- 	 
- 	 public void print_parsed_Arch(){ 
- 		  
- 		 for(int i = 0; i < parsed_Arch.size(); i++){ 
- 			 Arch_Channel ac = parsed_Arch.get(i); 
- 			 System.out.println("channel name = " + ac.name); 
- 			 System.out.println(" start = " + ac.start); 
- 			 System.out.println(" end = " + ac.end); 
- 			  
- 			 for(int j = 0; j < ac.event.size(); j++){				  
- 				 System.out.println("  event = " + ac.event.get(j));	  
- 			 } 
- 		 } 
- 	 } 
+ 	private static String replaceLast(String string, String toReplace, String replacement) {
+ 		int pos = string.lastIndexOf(toReplace);
+ 		if (pos > -1) {
+ 			return string.substring(0, pos)+ replacement + string.substring(pos +   toReplace.length(), string.length());
+ 		} else {
+ 			return string;
+ 		}
+ 	}
+ 	
+ 	public void print_parsed_Arch(){ 
+ 		
+ 		for(int i = 0; i < parsed_Arch.size(); i++){
+ 			Arch_Channel ac = parsed_Arch.get(i);
+ 			System.out.println("channel name = " + ac.name);
+ 			System.out.println(" start = " + ac.start);
+ 			System.out.println(" end = " + ac.end);
+ 			
+ 			for(int j = 0; j < ac.event.size(); j++){
+ 				System.out.println("  event = " + ac.event.get(j));
+ 			}
+ 		}
+ 	} 
  } 
