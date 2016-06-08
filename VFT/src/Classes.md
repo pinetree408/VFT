@@ -1,4 +1,4 @@
-[Parser]
+##[Parser]
 class parser
 
 	class
@@ -21,7 +21,7 @@ class parser
 		public ArrayList<Arch_Channel> get_pared_Arch()
 		private static String replaceLast(String string, String toReplace, String replacement)
 
-[Filter]
+##[Filter]
 class filter
 
 	class
@@ -65,5 +65,37 @@ class filter
 		protected ArrayList<String> getFileList()
 		protected ArrayList<String> getTestCaseList()
 		protected ArrayList<String> getFunctionListForTC()
-		protected ArrayList<String> getTestMethodList() 
+		protected ArrayList<String> getTestMethodList()
+
+##[View]
+class VFTView
+
+	variable
+		private Frame frame
+		private FilterWrapper Filter
+		private JPanel graphPanel
+		private JPanel treePanel
+		private JPanel selectPane
+		private JTabbedPane tabPane
+		private Integer filterRule
+		private String[] filterRules
+		private ArrayList<String> options
+		private String packageFrom
+		private String packageTo
+		private String file
+		private String testCase
+		private String testCaseMethod
+		private String testMethod
+	
+	function
+		private void drawGraph(int filterRule, ArrayList<String> options)
+		private void drawModal(MouseEvent e, String cellTitle, int filterRule) 
+		private JGraphXAdapter<String, String> changeGraphToAdapter(ListenableGraph<String, String> g)
+		private void drawTree(int filterRule, ArrayList<String> options)
+		private void drawSelectPane()
+		private void setOptions()
+		private void rePaintGraph()
+		private void rePaintTree()
+		private void resetSelectedItems()
+		
 		
