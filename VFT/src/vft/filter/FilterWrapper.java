@@ -11,7 +11,6 @@ import org.xml.sax.SAXException;
 public class FilterWrapper extends Filter {
 
 	private int filterRule;
-	private int viewMode;
 	private String interfaceName;
 	private String packageName1;
 	private String packageName2;
@@ -125,10 +124,6 @@ public class FilterWrapper extends Filter {
 
 	public void prePareLogData () {
 		super.prePareLogData();			
-	}
-
-	public ArrayList<ErrorInfo> getErrorInfo() {
-		return super.getErrorInfo();
 	}
 
 	public ArrayList<GraphNode> getGraphNode() {
