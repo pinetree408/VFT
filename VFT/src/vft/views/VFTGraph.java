@@ -2,8 +2,12 @@ package vft.views;
 
 import org.jgrapht.ListenableGraph;
 import org.jgrapht.graph.ListenableDirectedGraph;
+import org.xml.sax.SAXException;
 
+import java.io.IOException;
 import java.util.ArrayList;
+
+import javax.xml.parsers.ParserConfigurationException;
 
 import vft.filter.FilterWrapper;
 import vft.filter.Filter.GraphNode; 
@@ -44,7 +48,13 @@ public class VFTGraph {
         /////////////////////////////////////////       
         long start = System.currentTimeMillis();
         
-        FilterWrapper Filter = new FilterWrapper();        
+        FilterWrapper Filter = null;
+		try {
+			Filter = new FilterWrapper();
+		} catch (SAXException | IOException | ParserConfigurationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}        
         int i;
         String tmpList;          
         Filter.prePareLogData();

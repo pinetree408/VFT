@@ -1,13 +1,18 @@
 package vft.filter;
 
+import java.io.IOException;
 import java.util.ArrayList;
+
+import javax.xml.parsers.ParserConfigurationException;
+
+import org.xml.sax.SAXException;
 
 public class InterComponentFilter extends Filter {
 
 	private static String ComponentName1;
 	private static String ComponentName2;
 	
-	protected InterComponentFilter() {
+	protected InterComponentFilter() throws SAXException, IOException, ParserConfigurationException {
 		super();
 		// TODO Auto-generated constructor stub
 	}

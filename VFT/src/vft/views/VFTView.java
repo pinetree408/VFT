@@ -19,6 +19,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
+import java.io.IOException;
 
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
@@ -28,6 +29,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
+import javax.xml.parsers.ParserConfigurationException;
 
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.part.*;
@@ -39,6 +41,7 @@ import org.jgrapht.ListenableGraph;
 import org.jgrapht.event.GraphEdgeChangeEvent;
 import org.jgrapht.ext.JGraphXAdapter;
 import org.jgrapht.graph.DirectedMultigraph;
+import org.xml.sax.SAXException;
 
 import com.mxgraph.layout.hierarchical.mxHierarchicalLayout;
 import com.mxgraph.model.mxCell;
@@ -170,7 +173,13 @@ public class VFTView extends ViewPart {
             	if (cell instanceof mxCell) {
             		String cellTitle = ((mxCell) cell).getValue().toString();
 
-                	FilterWrapper Filter = new FilterWrapper();
+                	FilterWrapper Filter = null;
+					try {
+						Filter = new FilterWrapper();
+					} catch (SAXException | IOException | ParserConfigurationException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
             		JDialog infoDia = new JDialog();
             		infoDia.setLocation(100 + e.getX(), 100 + e.getY());
             		infoDia.setTitle(String.valueOf(filterRule));
@@ -198,7 +207,13 @@ public class VFTView extends ViewPart {
             public void actionPerformed(ActionEvent e) {
             	filterRule = comboBox.getSelectedIndex();
 
-            	FilterWrapper Filter = new FilterWrapper();
+            	FilterWrapper Filter = null;
+				try {
+					Filter = new FilterWrapper();
+				} catch (SAXException | IOException | ParserConfigurationException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
             	Filter.prePareLogData();
 
         		if (selectPane.getComponentCount() == 4) {
@@ -260,7 +275,16 @@ public class VFTView extends ViewPart {
 	                    	
 	                		if (selectPane.getComponentCount() == 4) {
 	                			selectPane.remove(selectPane.getComponentCount() - 1);
-	                		} 
+	                		}
+	                		
+	                    	FilterWrapper Filter = null;
+	        				try {
+	        					Filter = new FilterWrapper();
+	        				} catch (SAXException | IOException | ParserConfigurationException e1) {
+	        					// TODO Auto-generated catch block
+	        					e1.printStackTrace();
+	        				}
+	                    	Filter.prePareLogData();
 	                    	
 	            	        Filter.prePareTextTreeData(testCase);
 	            	        ArrayList<String> test = new ArrayList<String>();
@@ -314,7 +338,13 @@ public class VFTView extends ViewPart {
             @Override
             public void actionPerformed(ActionEvent e) {
             	options.clear();
-            	FilterWrapper Filter = new FilterWrapper();
+            	FilterWrapper Filter = null;
+				try {
+					Filter = new FilterWrapper();
+				} catch (SAXException | IOException | ParserConfigurationException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
             	Filter.prePareLogData();
             	if (filterRule == Filter.INTER_COMPONENT_FILTER) {
             		if (packageFrom == null){
