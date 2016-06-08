@@ -365,7 +365,6 @@ public class Filter {
 
 	private boolean setInterfaceNode(String interfaceName) {
 
-		System.out.println(interfaceName);
 		int i, j, k;
 		boolean ret = false;
 		LogData tempLogData;
