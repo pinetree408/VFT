@@ -63,14 +63,14 @@ public class VFTView extends ViewPart {
 	private Frame frame;
 
 	private FilterWrapper Filter;
-	
+
 	private JPanel graphPanel;
 	private JPanel treePanel;
 	private JPanel selectPane;
 	private JTabbedPane tabPane;
 	private Integer filterRule;
-	private String[] filterRules = { "NONE", "INTER_COMPONENT_FILTER", "FILE_FILTER", "TEST_CASE_FILTER",
-	"TEST_METHOD_FILTER" };
+	private String[] filterRules = { "NONE", "INTER_COMPONENT_FILTER",
+			"FILE_FILTER", "TEST_CASE_FILTER", "TEST_METHOD_FILTER" };
 
 	private ArrayList<String> options;
 	private String packageFrom;
@@ -91,7 +91,7 @@ public class VFTView extends ViewPart {
 	 * it.
 	 */
 	public void createPartControl(Composite parent) {
-		
+
 		// Initialize
 		filterRule = 0;
 		options = new ArrayList<String>();
@@ -103,9 +103,10 @@ public class VFTView extends ViewPart {
 			e1.printStackTrace();
 		}
 		Filter.prePareLogData();
-		
+
 		// Add JFrame in plug-in view
-		Composite composite = new Composite(parent, SWT.EMBEDDED | SWT.NO_BACKGROUND);
+		Composite composite = new Composite(parent, SWT.EMBEDDED
+				| SWT.NO_BACKGROUND);
 		frame = SWT_AWT.new_Frame(composite);
 
 		// Add Panel for graph
@@ -138,7 +139,8 @@ public class VFTView extends ViewPart {
 
 	private void drawGraph(int filterRule, ArrayList<String> options) {
 
-		ListenableGraph<String, String> g = VFTGraph.init(Filter, filterRule, options);
+		ListenableGraph<String, String> g = VFTGraph.init(Filter, filterRule,
+				options);
 		JGraphXAdapter<String, String> graphAdapter = changeGraphToAdapter(g);
 
 		mxHierarchicalLayout layout = new mxHierarchicalLayout(graphAdapter);
@@ -162,7 +164,7 @@ public class VFTView extends ViewPart {
 		graphPanel.add(grpahComponent);
 
 	}
-	
+
 	private void drawModal(MouseEvent e, String cellTitle, int filterRule) {
 		JDialog infoDia = new JDialog();
 		infoDia.setLocation(100 + e.getX(), 100 + e.getY());
@@ -170,18 +172,23 @@ public class VFTView extends ViewPart {
 		options.clear();
 		options.add(cellTitle);
 		JPanel dialogPannel = new JPanel(new BorderLayout());
-		dialogPannel.add(VFTTree.init(Filter, Filter.TEST_METHOD_FILTER, options));
+		dialogPannel.add(VFTTree.init(Filter, Filter.TEST_METHOD_FILTER,
+				options));
 		infoDia.add(new JScrollPane(dialogPannel));
 		infoDia.pack();
 		infoDia.setModal(true);
 		infoDia.setVisible(true);
 	}
-	
-	private JGraphXAdapter<String, String> changeGraphToAdapter(ListenableGraph<String, String> g) {
-		JGraphXAdapter<String, String> graphAdapter = new JGraphXAdapter<String, String>(g);
-		Object[] edgeCellArray = new Object[graphAdapter.getEdgeToCellMap().size()];
+
+	private JGraphXAdapter<String, String> changeGraphToAdapter(
+			ListenableGraph<String, String> g) {
+		JGraphXAdapter<String, String> graphAdapter = new JGraphXAdapter<String, String>(
+				g);
+		Object[] edgeCellArray = new Object[graphAdapter.getEdgeToCellMap()
+				.size()];
 		for (int i = 0; i < graphAdapter.getEdgeToCellMap().size(); ++i) {
-			edgeCellArray[i] = (Object) (graphAdapter.getEdgeToCellMap().get(g.edgeSet().toArray()[i]));
+			edgeCellArray[i] = (Object) (graphAdapter.getEdgeToCellMap().get(g
+					.edgeSet().toArray()[i]));
 		}
 		graphAdapter.setCellStyle("fontSize=3", edgeCellArray);
 		graphAdapter.setEnabled(false);
@@ -190,10 +197,10 @@ public class VFTView extends ViewPart {
 		graphAdapter.setCellsResizable(false);
 		graphAdapter.setCellsEditable(false);
 		graphAdapter.setAllowDanglingEdges(false);
-		
+
 		return graphAdapter;
 	}
-	
+
 	private void drawTree(int filterRule, ArrayList<String> options) {
 		treePanel.add(VFTTree.init(Filter, filterRule, options));
 	}
@@ -214,21 +221,26 @@ public class VFTView extends ViewPart {
 				}
 
 				if (filterRule == Filter.INTER_COMPONENT_FILTER) {
-					ArrayList<String> componentList = Filter.setFilterRule(Filter.INTER_COMPONENT_FILTER);
+					ArrayList<String> componentList = Filter
+							.setFilterRule(Filter.INTER_COMPONENT_FILTER);
 					JComboBox<String> packageBoxFrom = new JComboBox<String>(
-							componentList.toArray(new String[componentList.size()]));
+							componentList.toArray(new String[componentList
+									.size()]));
 					JComboBox<String> packageBoxTo = new JComboBox<String>(
-							componentList.toArray(new String[componentList.size()]));
+							componentList.toArray(new String[componentList
+									.size()]));
 					packageBoxFrom.addActionListener(new ActionListener() {
 						@Override
 						public void actionPerformed(ActionEvent e) {
-							packageFrom = packageBoxFrom.getSelectedItem().toString();
+							packageFrom = packageBoxFrom.getSelectedItem()
+									.toString();
 						}
 					});
 					packageBoxTo.addActionListener(new ActionListener() {
 						@Override
 						public void actionPerformed(ActionEvent e) {
-							packageTo = packageBoxTo.getSelectedItem().toString();
+							packageTo = packageBoxTo.getSelectedItem()
+									.toString();
 						}
 					});
 					options.clear();
@@ -238,9 +250,11 @@ public class VFTView extends ViewPart {
 					selectPane.add(packageBoxFrom);
 					selectPane.add(packageBoxTo);
 				} else if (filterRule == Filter.FILE_FILTER) {
-					ArrayList<String> componentList = Filter.setFilterRule(Filter.FILE_FILTER);
+					ArrayList<String> componentList = Filter
+							.setFilterRule(Filter.FILE_FILTER);
 					JComboBox<String> fileBox = new JComboBox<String>(
-							componentList.toArray(new String[componentList.size()]));
+							componentList.toArray(new String[componentList
+									.size()]));
 					fileBox.addActionListener(new ActionListener() {
 						@Override
 						public void actionPerformed(ActionEvent e) {
@@ -253,29 +267,36 @@ public class VFTView extends ViewPart {
 					}
 					selectPane.add(fileBox);
 				} else if (filterRule == Filter.TEST_CASE_FILTER) {
-					ArrayList<String> componentList = Filter.setFilterRule(Filter.TEST_CASE_FILTER);
+					ArrayList<String> componentList = Filter
+							.setFilterRule(Filter.TEST_CASE_FILTER);
 					JComboBox<String> testCaseBox = new JComboBox<String>(
-							componentList.toArray(new String[componentList.size()]));
+							componentList.toArray(new String[componentList
+									.size()]));
 					testCaseBox.addActionListener(new ActionListener() {
 						@Override
 						public void actionPerformed(ActionEvent e) {
 							testCase = testCaseBox.getSelectedItem().toString();
 
 							if (selectPane.getComponentCount() == 4) {
-								selectPane.remove(selectPane.getComponentCount() - 1);
+								selectPane.remove(selectPane
+										.getComponentCount() - 1);
 							}
 
 							Filter.prePareTextTreeData(testCase);
 							ArrayList<String> test = new ArrayList<String>();
-							ArrayList<TextualNode> textualNode = Filter.getTextualNode();
+							ArrayList<TextualNode> textualNode = Filter
+									.getTextualNode();
 
-							ArrayList<String> methodComponentList = Filter.setFilterRule(Filter.TEST_METHOD_FILTER);
+							ArrayList<String> methodComponentList = Filter
+									.setFilterRule(Filter.TEST_METHOD_FILTER);
 							TextualNode gTextualTemp = null;
 							for (int i = 0; i < textualNode.size(); i++) {
 								gTextualTemp = textualNode.get(i);
 								for (int j = 0; j < methodComponentList.size(); j++) {
-									if (methodComponentList.get(j).contains(gTextualTemp.functionName)) {
-										if (!test.contains(methodComponentList.get(j))) {
+									if (methodComponentList.get(j).contains(
+											gTextualTemp.functionName)) {
+										if (!test.contains(methodComponentList
+												.get(j))) {
 											test.add(methodComponentList.get(j));
 										}
 									}
@@ -283,12 +304,16 @@ public class VFTView extends ViewPart {
 							}
 							JComboBox<String> testCaseMethodBox = new JComboBox<String>(
 									test.toArray(new String[test.size()]));
-							testCaseMethodBox.addActionListener(new ActionListener() {
-								@Override
-								public void actionPerformed(ActionEvent e) {
-									testCaseMethod = testCaseMethodBox.getSelectedItem().toString();
-								}
-							});
+							testCaseMethodBox
+									.addActionListener(new ActionListener() {
+										@Override
+										public void actionPerformed(
+												ActionEvent e) {
+											testCaseMethod = testCaseMethodBox
+													.getSelectedItem()
+													.toString();
+										}
+									});
 							selectPane.add(testCaseMethodBox);
 							selectPane.revalidate();
 							selectPane.repaint();
@@ -296,13 +321,16 @@ public class VFTView extends ViewPart {
 					});
 					selectPane.add(testCaseBox);
 				} else if (filterRule == Filter.TEST_METHOD_FILTER) {
-					ArrayList<String> componentList = Filter.setFilterRule(Filter.TEST_METHOD_FILTER);
+					ArrayList<String> componentList = Filter
+							.setFilterRule(Filter.TEST_METHOD_FILTER);
 					JComboBox<String> testMethodBox = new JComboBox<String>(
-							componentList.toArray(new String[componentList.size()]));
+							componentList.toArray(new String[componentList
+									.size()]));
 					testMethodBox.addActionListener(new ActionListener() {
 						@Override
 						public void actionPerformed(ActionEvent e) {
-							testMethod = testMethodBox.getSelectedItem().toString();
+							testMethod = testMethodBox.getSelectedItem()
+									.toString();
 						}
 					});
 					selectPane.add(testMethodBox);
@@ -314,7 +342,7 @@ public class VFTView extends ViewPart {
 		});
 
 		Button drawButton = new Button("draw");
-		 drawButton.addActionListener(new ActionListener() {
+		drawButton.addActionListener(new ActionListener() {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -359,7 +387,7 @@ public class VFTView extends ViewPart {
 			options.add(testMethod);
 		}
 	}
-	
+
 	private void rePaintGraph() {
 		graphPanel.removeAll();
 		drawGraph(filterRule, options);
@@ -367,7 +395,7 @@ public class VFTView extends ViewPart {
 		graphPanel.repaint();
 		resetSelectedItems();
 	}
-	
+
 	private void rePaintTree() {
 		treePanel.removeAll();
 		drawTree(filterRule, options);
@@ -375,7 +403,7 @@ public class VFTView extends ViewPart {
 		treePanel.repaint();
 		resetSelectedItems();
 	}
-	
+
 	private void resetSelectedItems() {
 		packageFrom = null;
 		packageTo = null;
@@ -384,7 +412,7 @@ public class VFTView extends ViewPart {
 		testCaseMethod = null;
 		testMethod = null;
 	}
-	
+
 	/**
 	 * Passing the focus request to the viewer's control.
 	 */
