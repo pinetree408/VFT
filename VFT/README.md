@@ -58,5 +58,33 @@ Each parsing rules are in "set_edge" & "patternMatcher" function.
 So, If you change your log file's rule. you should change "patternMatcher" function's parsing rule.
 
 ##Filtering module
+The main file of Filtering module is "Filter.java" file.
+The main class is "Filter" defined in "Filter.java".
+"FilterWrapper.java"'s "FilterWrapper" class is extended by "Filter" class.
+And Setting options to other filtering rule class.
+"InterComponentFilter.java"'s "InterComponentFilter" class,
+"FileFilter.java"'s "FileFilter" class,
+"TestCaseFilter.java"'s "TestCaseFilter" class,
+"TestMethodFilter.java"'s "TestMethodFilter" class
+are also extended by "Filter" class and have their own setting funtions by filtering Rule.
 
-##Drawing module
+###[First]
+When FilterWrapper's construct call "FilterWrapper()" is created in Viewer's construct call "createPartControl()", "get_parsed_LogData()" and "get_pared_Arch()" functions are performed and set result to "pLogData", "pArchitectureData" variable.
+
+###[Second]
+If FilterWrapper's construct call was executed, Viewer call "prePareLogData()" function.
+"prePareLogData()" collect basic information from "pLogData", "pArchitectureData" variable.
+When "prePareLogData()" function was executed, Filter class has "packageList", "fileList", "testCaseList", "testMethodList" variable perfectly.
+
+###[Third]
+In UI, If user set filtering Rule and specific component, Viewer call "selectComponent()" function.
+"selectComponent()" function call each Filter class's "setFilterRule" function matched by filtering rule.
+Filter class's "setFilterRule" function call "Filter" class's "setArchitectureNode" function.
+"setArchitectureNode" function set "graphNode" variable matched by filtering rule.
+
+###[Forth]
+If "selectComponent()" function was executed, Viewer can draw graph & texture with "graphNode" variable.
+
+###[Fifth]
+If you want to change filtering rule, you should change filtering rule in "Filter" class.
+If you want to change filter, you should change "collectFilterInfoForFirstPage()" function and "setArchitectureNode" function.
