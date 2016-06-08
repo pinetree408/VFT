@@ -3,6 +3,8 @@ package vft.filter;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import javax.xml.parsers.ParserConfigurationException;
+
 import org.xml.sax.SAXException;
 
 import vft.parser.parser;
@@ -31,18 +33,11 @@ public class Filter {
     private ArrayList<LogData> pLogData = new ArrayList<LogData>();	// parsed log data
     parser parsedData = null;
 	
-    protected Filter() {  			
-		try {
+    protected Filter() throws SAXException, IOException, ParserConfigurationException {
 			parsedData = new parser();
 			pArchitectureData = parsedData.get_pared_Arch();
 			pLogData = parsedData.get_parsed_LogData();
-		} catch (SAXException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}	
+
 	}
 
 

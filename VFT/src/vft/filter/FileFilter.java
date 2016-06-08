@@ -1,12 +1,17 @@
 package vft.filter;
 
+import java.io.IOException;
 import java.util.ArrayList;
+
+import javax.xml.parsers.ParserConfigurationException;
+
+import org.xml.sax.SAXException;
 
 public class FileFilter  extends Filter {
 	
 	private static String fileName;
 	
-	protected FileFilter() {
+	protected FileFilter() throws SAXException, IOException, ParserConfigurationException {
 		super();
 		// TODO Auto-generated constructor stub
 	}

@@ -1,9 +1,13 @@
 package vft.views;
 
+import java.io.IOException;
 import java.util.ArrayList;
 
 import javax.swing.JTree;
 import javax.swing.tree.DefaultMutableTreeNode;
+import javax.xml.parsers.ParserConfigurationException;
+
+import org.xml.sax.SAXException;
 
 import vft.filter.FilterWrapper;
 import vft.filter.Filter.GraphNode;
@@ -38,7 +42,13 @@ public class VFTTree {
     	ArrayList<GraphNode> graphNode = new ArrayList<GraphNode>();
     	ArrayList<TextualNode> textualNode = new ArrayList<TextualNode>();
     	ArrayList<String> componentList;
-        FilterWrapper Filter = new FilterWrapper();        
+        FilterWrapper Filter = null;
+		try {
+			Filter = new FilterWrapper();
+		} catch (SAXException | IOException | ParserConfigurationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}        
         int i;
         String tmpList;          
         Filter.prePareLogData();

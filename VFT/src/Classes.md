@@ -20,6 +20,5 @@ class parser
 		public ArrayList<LogData> get_parsed_LogData()
 		public ArrayList<Arch_Channel> get_pared_Arch()
 		private static String replaceLast(String string, String toReplace, String replacement)
-		public void print_parsed_Arch()
 		 	 
 		
