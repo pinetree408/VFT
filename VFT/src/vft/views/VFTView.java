@@ -190,6 +190,8 @@ public class VFTView extends ViewPart {
 			edgeCellArray[i] = (Object) (graphAdapter.getEdgeToCellMap().get(g
 					.edgeSet().toArray()[i]));
 		}
+		
+		// Set Style to graph
 		graphAdapter.setCellStyle("fontSize=3", edgeCellArray);
 		graphAdapter.setEnabled(false);
 		graphAdapter.setConnectableEdges(false);
