@@ -47,10 +47,4 @@ public class paserTest {
 		assertNotEquals(null, parsedData.get_pared_Arch());
 	}
 
-	@Test
-	public void testPrint_parsed_Arch() throws SAXException, IOException, ParserConfigurationException {
-		parser parsedData = new parser();
-		assertNotEquals(null, parsedData);
-	}
-
 }
