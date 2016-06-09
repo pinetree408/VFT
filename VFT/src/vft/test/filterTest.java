@@ -74,8 +74,7 @@ public class filterTest {
 	@Test
 	public void testFilterWrapper() throws SAXException, IOException, ParserConfigurationException {
 		FilterWrapper Filter = new FilterWrapper();
-		Filter.prePareLogData();
-		assertNotEquals(null, Filter.getFunctionListForTC());
+		assertNotEquals(null, Filter);
 	}
 
 	@Test
