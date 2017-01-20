@@ -7,26 +7,26 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.xml.sax.SAXException;
 
-public class FileFilter  extends Filter {
-	
-	private static String fileName;
-	
-	protected FileFilter() throws SAXException, IOException, ParserConfigurationException {
-		super();
-		// TODO Auto-generated constructor stub
-	}
+public class FileFilter extends Filter {
 
-	protected boolean setFilterRule(String packageName) {
-		fileName = packageName;
-		return collectErrorInfo();
-	}
+  private static String fileName;
 
-	private boolean collectErrorInfo() {
-		return super.setArchitectureNode(FILE_FILTER, fileName, null);
-	}
+  protected FileFilter() throws SAXException, IOException, ParserConfigurationException {
+    super();
+    // TODO Auto-generated constructor stub
+  }
 
-	protected ArrayList<String> getFileList() {
-		return super.getFileList();
-	}
+  protected boolean setFilterRule(String packageName) {
+    fileName = packageName;
+    return collectErrorInfo();
+  }
+
+  private boolean collectErrorInfo() {
+    return super.setArchitectureNode(FILE_FILTER, fileName, null);
+  }
+
+  protected ArrayList<String> getFileList() {
+    return super.getFileList();
+  }
 
 }
