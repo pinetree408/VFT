@@ -8,6 +8,7 @@ based on Eclipse plug-in
 
 ##How to work on this project
 Setting up your system
+
 1. Install eclips plugin development tool
     - Help > Install New Software
 2. Run plugin.xml file with Eclipse Application Configurations
