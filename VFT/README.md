@@ -1,15 +1,15 @@
-#Development guideline for VFT
+# Development guideline for VFT
 
-##Structure of VFT project  
+## Structure of VFT project  
 VFT project consists of parser, view, filter.  
 Each parts match vft.parser, vft.filter, (vft, vft.views) packages.  
 Each packages have following java sourcre code.  
 
-###[parser]
+### [parser]
 + vft.parser
     + parser.java
 
-###[filter]
+### [filter]
 + vft.filter
     + FilterWrapper.java => wrapper of filter
     + Filter.java => parent of each filter module
@@ -18,7 +18,7 @@ Each packages have following java sourcre code.
     + TestCaseFilter.java => filter for test case filtering rule
     + TestMethodFilter.java => filter for test method filtering rule
 
-###[view]
+### [view]
 + vft
     + Activator.java => eclipse plug-in activator
 + vft.views
@@ -26,11 +26,11 @@ Each packages have following java sourcre code.
     + VFTGraph.java => graph view part
     + VFTTree.java => texture tree view part
 
-##Parsing module
+## Parsing module
 The main file of Parsing module is "parser.java" file.  
 The main class is "parser" defined in "parser.java".  
 
-###[First Step]
+### [First Step]
 When parser's construct call "parser()" is created in filter's construct call,   "Filter()", "xml_parsing()" and "log_parsing()" functions are performed.  
 These two functions are received log files in "logs" directory.  
 The input log files are located in "logs".  
@@ -47,7 +47,7 @@ So the "parsed_Arch" variable in type of "ArrayList of class Arch_Channel" is fi
 The "LogData" class is for log file.  
 So the "parsed_LogData" variable in type of "ArrayList of class LogData" is filled by parsing log file.  
 
-###[How to modify Parsing Module]
+### [How to modify Parsing Module]
 If you want to change the log files, you should set *ArchitectureFileName* and *LogFileName* variable.  
 If you want to change parsing rule, you should change "xml_parsing()" and "log_parsing()" function.  
 
@@ -120,7 +120,7 @@ So, If you change your log file's rule. you should change "patternMatcher" funct
 		 } 
 ```
 
-##Filtering module
+## Filtering module
 The main file of Filtering module is "Filter.java" file.  
 The main class is "Filter" defined in "Filter.java".  
 "FilterWrapper.java"'s "FilterWrapper" class is extended by "Filter" class.  
@@ -131,27 +131,27 @@ And Setting options to other filtering rule class.
 "TestMethodFilter.java"'s "TestMethodFilter" class  
 are also extended by "Filter" class and have their own setting funtions by filtering Rule.  
 
-###[First Step]
+### [First Step]
 When FilterWrapper's construct call "FilterWrapper()" is created in Viewer's construct call "createPartControl()",  
 "get_parsed_LogData()" and "get_pared_Arch()" functions are performed and set result to "pLogData", "pArchitectureData" variable.  
 
-###[Second Step]
+### [Second Step]
 If FilterWrapper's construct call was executed, Viewer call "prePareLogData()" function.  
 "prePareLogData()" collect basic information from "pLogData", "pArchitectureData" variable.  
 When "prePareLogData()" function was executed,  
 Filter class has "packageList", "fileList", "testCaseList", "testMethodList" variable perfectly.  
 
-###[Third Step]
+### [Third Step]
 In UI, If user set filtering Rule and specific component,  
 Viewer call "selectComponent()" function.  
 "selectComponent()" function call each Filter class's "setFilterRule" function matched by filtering rule.  
 Filter class's "setFilterRule" function call "Filter" class's "setArchitectureNode" function.  
 "setArchitectureNode" function set "graphNode" variable matched by filtering rule.  
 
-###[Forth Step]
+### [Forth Step]
 If "selectComponent()" function was executed, Viewer can draw graph & texture with "graphNode" variable.  
 
-###[How to modify Filtering module]
+### [How to modify Filtering module]
 If you want to change filtering rule, you should change filtering rule in "Filter" class.  
 ```
 	
@@ -224,7 +224,7 @@ If you want to change filter, you should change "collectFilterInfoForFirstPage()
 
 ```
 
-##Viewing Module
+## Viewing Module
 The main file of Viewing module is "VFTView.java" file.  
 The main class is "createPartControl" defined in "VFTView.java".  
 In "createPartControl" function, Filter class is executed.  
@@ -233,20 +233,20 @@ Viewing Module consists of two part("tab pannel", "select pannel").
 The "tabPane" draw graph & texture tree by selected filtering rule.
 The "selectPane" draw select buttons for filtering rule.
 
-###[First Step]
+### [First Step]
 When user select filtering rule at "comboBox" component,  
 "comboBox" set filtering rule to "VFTView" class and draw more buttons for specific options.  
 
-###[Second Step]
+### [Second Step]
 When user click "drawButton" component,  
 "VFTView" class provide options for "VFTGraph" class & "VFTTree" class.  
 Then Each draw graph & texture class call Filter's "selectComponent" function.  
 
-###[Third Step]
+### [Third Step]
 When Filter's "selectComponent" function was executed at Each draw grap & texture class,  
 "VFTView" class repaint graph & texture.  
 
-###[How to modify Viewing Module]
+### [How to modify Viewing Module]
 If you want to change graph style, you should change "changeGraphToAdapter()" function.  
 ```
 
