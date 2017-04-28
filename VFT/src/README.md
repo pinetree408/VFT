@@ -1,7 +1,7 @@
-#Class guideline for VFT
+# Class guideline for VFT
 
-##[Parser]
-###class parser
+## [Parser]
+### class parser
 ```
 
 	class
@@ -24,8 +24,8 @@
 	    + public ArrayList<Arch_Channel> get_pared_Arch()
 	    - private static String replaceLast(String string, String toReplace, String replacement)
 ```
-##[Filter]
-###class filter
+## [Filter]
+### class filter
 ```
 
 	class
@@ -69,8 +69,8 @@
 	    = protected ArrayList<String> getFunctionListForTC()
 	    = protected ArrayList<String> getTestMethodList()
 ```
-##[View]
-###class VFTView
+## [View]
+### class VFTView
 ```
 
 	variable
