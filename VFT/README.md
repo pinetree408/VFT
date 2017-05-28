@@ -36,7 +36,7 @@ These two functions are received log files in "logs" directory.
 The input log files are located in "logs".  
 Each logs path is mathced "ArchitectureFileName" and "LogFileName" variable.  
 
-###[Second Step]
+### [Second Step]
 "xml_parsing()" sets "parsed_Arch" variable with xml parser in java library & architecture file.  
 "parsed_Arch" consists of "Arch_channel" classes.  
 The "Arch_Channel" class is for Architecture Spec file.  
